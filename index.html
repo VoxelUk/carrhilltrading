@@ -198,9 +198,14 @@
       font-weight: 900;
     }
 
-    .creator-card button {
-      white-space: nowrap;
-    }
+    .creator-card button { white-space: nowrap; }
+    #announcementBar { position:sticky;top:73px;z-index:19;margin:0 auto;padding:12px 20px;text-align:center;background:#7b0000;border-bottom:1px solid #ff3434;font-weight:800; }
+    .dev-badge,.mod-badge { margin-left:5px;font-size:.9em; }
+    .chat-box { height:320px;overflow-y:auto;background:#0b0b0b;border:1px solid #292929;border-radius:14px;padding:12px;margin-bottom:12px; }
+    .chat-msg { max-width:80%;padding:9px 11px;border-radius:12px;background:#1b1b1b;margin:7px 0;word-break:break-word; }
+    .chat-msg.mine { margin-left:auto;background:#620000; }
+    .admin-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    @media(max-width:700px){.admin-grid{grid-template-columns:1fr}}
 
     main {
       width: 100%;
@@ -385,7 +390,7 @@
       z-index: 50;
       height: 70px;
       display: grid;
-      grid-template-columns: repeat(4,1fr);
+      grid-template-columns: repeat(5,1fr);
       background: rgba(10,10,10,.94);
       backdrop-filter: blur(20px);
       border-top: 1px solid #252525;
@@ -550,6 +555,8 @@
     </div>
 
   </header>
+
+  <div id="announcementBar" class="hidden"></div>
 
   <div class="creator-banner">
     <div class="creator-card">
@@ -788,6 +795,41 @@
     </section>
 
 
+    <!-- NEGOTIATIONS -->
+    <section id="negotiationsPage" class="page">
+      <div class="card">
+        <h2>💬 Negotiations</h2>
+        <p class="muted">Private messages with accepted friends.</p><br>
+        <select id="chatFriend" onchange="openChat(this.value)"><option value="">Select a friend</option></select>
+        <div id="chatBox" class="chat-box"><p class="muted">Choose a friend to start negotiating.</p></div>
+        <input id="chatInput" maxlength="500" placeholder="Message your friend..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="primary" onclick="sendMessage()">Send Message</button>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="adminPage" class="page">
+      <div class="card">
+        <h2>🔨 Developer Panel</h2>
+        <p class="muted">Only the Carr Hill developer account can use these controls.</p>
+      </div>
+      <div class="admin-grid">
+        <div class="card">
+          <h3>📢 Global Announcement</h3>
+          <input id="announcementInput" maxlength="180" placeholder="Message everyone...">
+          <select id="announcementStyle"><option value="normal">Normal</option><option value="important">🚨 Important</option><option value="party">🎉 Party</option></select>
+          <button class="primary" onclick="publishAnnouncement()">Publish</button><br><br>
+          <button class="danger" onclick="clearAnnouncements()">Clear announcement</button>
+        </div>
+        <div class="card">
+          <h3>🛡️ Moderator Manager</h3>
+          <input id="adminUserSearch" maxlength="20" placeholder="Search username...">
+          <button class="secondary" onclick="adminSearchUsers()">Search users</button>
+          <div id="adminUserResults"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- PROFILE -->
 
     <section id="profilePage" class="page">
@@ -812,6 +854,11 @@
           -
         </p>
 
+      </div>
+
+      <div id="adminShortcut" class="card hidden">
+        <h3>🔨 Developer Tools</h3>
+        <button class="primary" onclick="openPage('admin')">Open Admin Panel</button>
       </div>
 
       <div class="card">
@@ -858,6 +905,10 @@
     >
       <span>♟</span>
       Friends
+    </button>
+
+    <button class="nav-btn" id="nav-negotiations" onclick="openPage('negotiations')">
+      <span>💬</span>Chat
     </button>
 
     <button
@@ -955,6 +1006,16 @@ let theirOffer = [];
 let friends = [];
 let incomingRequests = [];
 let incomingTrades = [];
+let currentProfile = null;
+let activeChatFriend = null;
+const DEV_ID = "4d42240e-fe81-49e5-a4d5-2b0f23262fe0";
+
+function roleBadge(profile) {
+  if (!profile) return "";
+  if (profile.id === DEV_ID || profile.role === "admin") return '<span class="dev-badge" title="Developer">🔨</span>';
+  if (profile.role === "moderator") return '<span class="mod-badge" title="Moderator">🛡️</span>';
+  return "";
+}
 
 
 /* =========================================================
@@ -1232,7 +1293,7 @@ async function loadProfile() {
   const { data, error } =
     await supabaseClient
       .from("profile")
-      .select("username, avatar_url")
+      .select("username, avatar_url, role")
       .eq("id", currentUser.id)
       .maybeSingle();
 
@@ -1240,6 +1301,8 @@ async function loadProfile() {
     console.error("Profile loading error:", error);
   }
 
+  currentProfile = data ? { ...data, id: currentUser.id } : { id: currentUser.id, role: "user" };
+  document.getElementById("adminShortcut")?.classList.toggle("hidden", currentUser.id !== DEV_ID);
   const username =
     data?.username ||
     currentUser.user_metadata?.username ||
@@ -1247,7 +1310,7 @@ async function loadProfile() {
     "User";
 
   if (usernameEl) {
-    usernameEl.textContent = username;
+    usernameEl.innerHTML = escapeHTML(username) + roleBadge(currentProfile);
   }
 
   if (welcomeEl) {
@@ -1765,7 +1828,7 @@ async function loadFriends() {
       data: profiles
     } = await supabaseClient
       .from("profile")
-      .select("id, username")
+      .select("id, username, role")
       .in("id", friendIds);
 
     friends = profiles || [];
@@ -1773,6 +1836,7 @@ async function loadFriends() {
 
   renderFriends();
   populateTradeFriends();
+  populateChatFriends();
 }
 
 
@@ -1807,7 +1871,7 @@ function renderFriends() {
 
         <div>
           <div class="username">
-            ${escapeHTML(friend.username)}
+            ${escapeHTML(friend.username)}${roleBadge(friend)}
           </div>
 
           <div class="user-id">
@@ -2313,6 +2377,58 @@ async function declineTrade(id) {
 
 
 /* =========================================================
+   CHAT / ANNOUNCEMENTS / ADMIN
+========================================================= */
+function populateChatFriends(){
+  const s=document.getElementById("chatFriend"); if(!s)return;
+  s.innerHTML='<option value="">Select a friend</option>'+friends.map(f=>`<option value="${f.id}">${escapeHTML(f.username)}</option>`).join("");
+}
+async function openChat(id){ activeChatFriend=id||null; await loadMessages(); }
+async function loadMessages(){
+  const box=document.getElementById("chatBox"); if(!box||!activeChatFriend)return;
+  const {data,error}=await supabaseClient.from("messages").select("*").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${activeChatFriend}),and(sender_id.eq.${activeChatFriend},receiver_id.eq.${currentUser.id})`).order("created_at",{ascending:true}).limit(200);
+  if(error){console.error(error);return}
+  box.innerHTML=(data||[]).length?(data||[]).map(m=>`<div class="chat-msg ${m.sender_id===currentUser.id?"mine":""}">${escapeHTML(m.message)}</div>`).join(""):'<p class="muted">No messages yet.</p>';
+  box.scrollTop=box.scrollHeight;
+}
+async function sendMessage(){
+  const i=document.getElementById("chatInput"),message=i.value.trim();
+  if(!activeChatFriend){showToast("Select a friend first");return} if(!message)return;
+  const {error}=await supabaseClient.from("messages").insert({sender_id:currentUser.id,receiver_id:activeChatFriend,message});
+  if(error){showToast("Could not send message");console.error(error);return} i.value=""; await loadMessages();
+}
+async function loadAnnouncement(){
+  const {data}=await supabaseClient.from("announcements").select("*").eq("active",true).order("created_at",{ascending:false}).limit(1).maybeSingle();
+  const b=document.getElementById("announcementBar"); if(!b)return;
+  if(!data){b.classList.add("hidden");return}
+  b.textContent=(data.style==="important"?"🚨 ":data.style==="party"?"🎉 ":"📢 ")+data.message; b.classList.remove("hidden");
+}
+async function publishAnnouncement(){
+  if(currentUser?.id!==DEV_ID)return;
+  const i=document.getElementById("announcementInput"),message=i.value.trim(); if(!message)return;
+  await clearAnnouncements(false);
+  const {error}=await supabaseClient.from("announcements").insert({message,style:document.getElementById("announcementStyle").value,created_by:currentUser.id});
+  if(error){showToast("Could not publish");console.error(error);return} i.value="";showToast("Announcement sent globally");
+}
+async function clearAnnouncements(toast=true){
+  if(currentUser?.id!==DEV_ID)return;
+  const {error}=await supabaseClient.from("announcements").update({active:false}).eq("active",true);
+  if(error){console.error(error);return} if(toast)showToast("Announcement cleared");
+}
+async function adminSearchUsers(){
+  if(currentUser?.id!==DEV_ID)return;
+  const q=document.getElementById("adminUserSearch").value.trim(); if(!q)return;
+  const {data,error}=await supabaseClient.from("profile").select("id,username,role").ilike("username",`%${q}%`).limit(15);
+  if(error){console.error(error);return}
+  document.getElementById("adminUserResults").innerHTML=(data||[]).map(u=>`<div class="friend-card"><div><b>${escapeHTML(u.username)}${roleBadge(u)}</b><div class="user-id">${escapeHTML(u.role||"user")}</div></div>${u.id===DEV_ID?"<span>Developer</span>":`<div class="button-row"><button class="secondary" onclick="setRole('${u.id}','moderator')">Make Mod</button><button class="danger" onclick="setRole('${u.id}','user')">Remove Mod</button></div>`}</div>`).join("");
+}
+async function setRole(id,role){
+  if(currentUser?.id!==DEV_ID)return;
+  const {error}=await supabaseClient.rpc("set_user_role",{target_user:id,new_role:role});
+  if(error){showToast("Role change failed");console.error(error);return}showToast(role==="moderator"?"Moderator added":"Moderator removed");adminSearchUsers();
+}
+
+/* =========================================================
    REALTIME
 ========================================================= */
 
@@ -2336,19 +2452,11 @@ function setupRealtime() {
 
       }
     )
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "trades"
-      },
-      async () => {
-
-        await loadTrades();
-
-      }
-    )
+    .on("postgres_changes",{event:"*",schema:"public",table:"trades"},async()=>{await loadTrades()})
+    .on("postgres_changes",{event:"*",schema:"public",table:"messages"},async payload=>{
+      if(activeChatFriend && (payload.new?.sender_id===activeChatFriend || payload.new?.receiver_id===activeChatFriend)) await loadMessages();
+    })
+    .on("postgres_changes",{event:"*",schema:"public",table:"announcements"},async()=>{await loadAnnouncement()})
     .subscribe();
 }
 
@@ -2371,6 +2479,7 @@ async function startup() {
 
   if (session) {
     await loadUser();
+    await loadAnnouncement();
   }
 
   supabaseClient.auth.onAuthStateChange(
