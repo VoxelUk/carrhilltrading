@@ -195,7 +195,10 @@
     .online {
       color: #5cff78;
       font-size: 12px;
+      transition:color .25s ease,opacity .25s ease;
     }
+    .online.offline{color:#ffb347}
+    .online.offline::before{content:"⚡ ";}
 
     .creator-banner {
       max-width: 1000px;
@@ -608,7 +611,7 @@
 
     <div style="display:flex;align-items:center;gap:10px">
       <button id="headerAdminBtn" class="secondary hidden" onclick="openPage('admin')" style="padding:7px 10px">🔨 Admin</button>
-      <div class="online">● <span id="onlineCount">1 ONLINE</span></div>
+      <div class="online" id="connectionBadge">● <span id="onlineCount">1 ONLINE</span></div>
     </div>
 
   </header>
@@ -2716,6 +2719,24 @@ async function setRole(id,role){
 /* =========================================================
    REALTIME
 ========================================================= */
+
+function updateConnectionUI(){
+  const badge=document.getElementById("connectionBadge"),count=document.getElementById("onlineCount");
+  if(!badge||!count)return;
+  if(!navigator.onLine){
+    badge.classList.add("offline");
+    count.textContent="OFFLINE";
+  }else{
+    badge.classList.remove("offline");
+    if(presenceChannel){
+      const n=Object.keys(presenceChannel.presenceState()||{}).length;
+      count.textContent=(n||1)+" ONLINE";
+    }else count.textContent="ONLINE";
+  }
+}
+window.addEventListener("online",()=>{updateConnectionUI();showToast("Back online ✓");if(currentUser){setupPresence();loadFriends();loadRequests();loadTrades();loadLeaderboard();}});
+window.addEventListener("offline",()=>{updateConnectionUI();showToast("Offline mode — calculator still works");});
+document.addEventListener("DOMContentLoaded",updateConnectionUI);
 
 function setupPresence(){
   if(!currentUser)return;
