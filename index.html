@@ -664,6 +664,14 @@
 
       </div>
 
+      <div id="weeklySpotlight" class="card hidden" style="margin-top:15px"></div>
+
+      <div class="card" style="margin-top:15px">
+        <h2>🏆 Verified Trade Leaderboard</h2>
+        <p class="muted">Trades personally verified in school by the developer.</p>
+        <div id="tradeLeaderboard" style="margin-top:12px"><p class="muted">Loading leaderboard...</p></div>
+      </div>
+
       <div class="card" style="margin-top:15px">
 
         <h2>Quick Trade</h2>
@@ -888,6 +896,23 @@
             <button class="secondary" onclick="startGlobalFun('disco')">🪩 Disco Mode</button>
             <button class="secondary" onclick="startGlobalFun('money')">💸 Money Rain</button>
             <button class="secondary" onclick="startGlobalFun('snow')">❄️ Snowstorm</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>⭐ Shoutouts & Weekly Spotlight</h3>
+          <input id="shoutoutUser" maxlength="20" placeholder="Username...">
+          <input id="shoutoutMessage" maxlength="120" placeholder="Why are you shouting them out?">
+          <div class="button-row">
+            <button class="secondary" onclick="adminSpotlight('shoutout')">📣 Shoutout</button>
+            <button class="primary" onclick="adminSpotlight('helpful')">🏆 Most Helpful This Week</button>
+          </div>
+          <hr style="border:0;border-top:1px solid #333;margin:22px 0">
+          <h3>✅ Verify In-School Trade</h3>
+          <p class="muted">After you personally watch a trade happen, add one verified trade to that user's total.</p>
+          <input id="verifyTradeUser" maxlength="20" placeholder="Username...">
+          <div class="button-row">
+            <button class="primary" onclick="changeVerifiedTrades(1)">+1 Verified Trade</button>
+            <button class="danger" onclick="changeVerifiedTrades(-1)">Undo -1</button>
           </div>
         </div>
         <div class="card">
@@ -1355,6 +1380,7 @@ async function loadUser() {
   await loadFriends();
   await loadRequests();
   await loadTrades();
+  await loadLeaderboard();
 
   setupRealtime();
   setupPresence();
@@ -2638,6 +2664,42 @@ async function clearAnnouncements(toast=true){
   const {error}=await supabaseClient.from("announcements").update({active:false}).eq("active",true);
   if(error){console.error(error);return} if(toast)showToast("Announcement cleared");
 }
+async function loadLeaderboard(){
+  const {data,error}=await supabaseClient.from("profile").select("id,username,verified_trades,weekly_title,weekly_note").order("verified_trades",{ascending:false}).limit(10);
+  const box=document.getElementById("tradeLeaderboard"); if(!box)return;
+  if(error){box.innerHTML='<p class="muted">Leaderboard unavailable.</p>';console.error(error);return}
+  const ranked=(data||[]).filter(u=>(u.verified_trades||0)>0);
+  box.innerHTML=ranked.length?ranked.map((u,i)=>'<div class="friend-card"><div><b>'+(i+1)+'. '+escapeHTML(u.username||"User")+'</b></div><strong>'+(u.verified_trades||0)+' verified</strong></div>').join(""):'<p class="muted">No verified trades yet.</p>';
+  const featured=(data||[]).find(u=>u.weekly_title);
+  const s=document.getElementById("weeklySpotlight");
+  if(s&&featured){s.classList.remove("hidden");s.innerHTML='<h2>'+(featured.weekly_title==="helpful"?"🏆 Most Helpful This Week":"📣 Shoutout")+'</h2><h3>@'+escapeHTML(featured.username||"User")+'</h3><p class="muted">'+escapeHTML(featured.weekly_note||"")+'</p>'}
+  else if(s)s.classList.add("hidden");
+}
+async function findProfileByUsername(username){
+  const {data,error}=await supabaseClient.from("profile").select("id,username,verified_trades").ilike("username",username).limit(1).maybeSingle();
+  if(error)throw error; return data;
+}
+async function changeVerifiedTrades(delta){
+  if(currentUser?.id!==DEV_ID)return;
+  const name=document.getElementById("verifyTradeUser").value.trim();if(!name)return showToast("Enter a username");
+  try{
+    const u=await findProfileByUsername(name);if(!u)return showToast("User not found");
+    const next=Math.max(0,(u.verified_trades||0)+delta);
+    const {error}=await supabaseClient.rpc("admin_set_verified_trades",{target_user:u.id,new_count:next});
+    if(error)throw error;showToast(delta>0?"Verified trade added ✓":"Verified trade removed");await loadLeaderboard();
+  }catch(e){console.error(e);showToast("Could not update: "+e.message)}
+}
+async function adminSpotlight(kind){
+  if(currentUser?.id!==DEV_ID)return;
+  const name=document.getElementById("shoutoutUser").value.trim(),note=document.getElementById("shoutoutMessage").value.trim();
+  if(!name)return showToast("Enter a username");
+  try{
+    const u=await findProfileByUsername(name);if(!u)return showToast("User not found");
+    const {error}=await supabaseClient.rpc("admin_set_spotlight",{target_user:u.id,title:kind,note});
+    if(error)throw error;showToast(kind==="helpful"?"Most Helpful updated 🏆":"Shoutout posted 📣");await loadLeaderboard();
+  }catch(e){console.error(e);showToast("Could not post: "+e.message)}
+}
+
 async function adminSearchUsers(){
   if(currentUser?.id!==DEV_ID)return;
   const q=document.getElementById("adminUserSearch").value.trim(); if(!q)return;
