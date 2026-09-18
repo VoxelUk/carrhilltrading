@@ -174,6 +174,24 @@
       font-size: 20px;
     }
 
+    .header-logo{
+      display:flex;align-items:center;gap:8px;position:relative;
+      font-weight:900;letter-spacing:.08em;line-height:.82;
+      transform-origin:left center;animation:brandFloat 3.2s ease-in-out infinite;
+    }
+    .brand-mark{
+      display:grid;place-items:center;width:34px;height:34px;border-radius:10px;
+      background:linear-gradient(145deg,#f22,#8b0000 58%,#240000);
+      border:1px solid rgba(255,255,255,.16);box-shadow:0 0 18px rgba(255,0,0,.28),inset 0 1px rgba(255,255,255,.18);
+      font-size:14px;font-style:italic;transform:skew(-7deg);animation:brandPulse 2.4s ease-in-out infinite;
+    }
+    .brand-words{display:flex;flex-direction:column;font-size:15px;text-shadow:0 2px 10px rgba(255,0,0,.28)}
+    .brand-words span:last-child{color:#ff3b3b;letter-spacing:.18em}
+    .brand-spark{position:absolute;right:-13px;top:-8px;color:#ff5656;font-size:9px;animation:sparkPop 1.8s ease-in-out infinite}
+    @keyframes brandFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+    @keyframes brandPulse{0%,100%{box-shadow:0 0 12px rgba(255,0,0,.22),inset 0 1px rgba(255,255,255,.18)}50%{box-shadow:0 0 26px rgba(255,0,0,.48),inset 0 1px rgba(255,255,255,.22)}}
+    @keyframes sparkPop{0%,100%{opacity:.25;transform:scale(.7) rotate(0)}50%{opacity:1;transform:scale(1.25) rotate(90deg)}}
+    header{overflow:visible}
     .online {
       color: #5cff78;
       font-size: 12px;
@@ -558,7 +576,9 @@
   <header>
 
     <div class="header-logo">
-      CARR HILL
+      <span class="brand-mark">CH</span>
+      <span class="brand-words"><span>CARR</span><span>HILL</span></span>
+      <span class="brand-spark">✦</span>
     </div>
 
     <div style="display:flex;align-items:center;gap:10px">
