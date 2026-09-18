@@ -416,7 +416,11 @@
       color: #ff2525;
     }
 
-    #tacoRain{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden}
+    #tacoRain,#globalFunLayer{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden}
+    .fun-drop{position:absolute;top:-70px;animation:funFall linear forwards;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35))}
+    @keyframes funFall{to{transform:translateY(115vh) rotate(720deg)}}
+    .disco-global{animation:discoGlobal .45s steps(1) infinite}
+    @keyframes discoGlobal{0%{filter:hue-rotate(0deg) saturate(1.5)}25%{filter:hue-rotate(90deg) saturate(2)}50%{filter:hue-rotate(180deg) saturate(2)}75%{filter:hue-rotate(270deg) saturate(2)}}
     .falling-taco{position:absolute;top:-70px;font-size:42px;animation:tacoFall linear forwards;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45))}
     @keyframes tacoFall{to{transform:translateY(115vh) rotate(900deg)}}
 
@@ -832,6 +836,14 @@
           <h3>🌮 Taco Tuesday</h3>
           <p class="muted">Make tacos rain on everyone's screen for 15 seconds.</p>
           <button class="primary" onclick="startTacoTuesday()">🌮 START TACO TUESDAY</button>
+          <div style="height:12px"></div>
+          <h3>🎉 Global Fun</h3>
+          <div class="button-row">
+            <button class="secondary" onclick="startGlobalFun('confetti')">🎊 Confetti Blast</button>
+            <button class="secondary" onclick="startGlobalFun('disco')">🪩 Disco Mode</button>
+            <button class="secondary" onclick="startGlobalFun('money')">💸 Money Rain</button>
+            <button class="secondary" onclick="startGlobalFun('snow')">❄️ Snowstorm</button>
+          </div>
         </div>
         <div class="card">
           <h3>🛡️ Moderator Manager</h3>
@@ -939,6 +951,7 @@
 
 <div id="toast"></div>
 <div id="tacoRain" aria-hidden="true"></div>
+<div id="globalFunLayer" aria-hidden="true"></div>
 
 
 <script>
@@ -2408,6 +2421,12 @@ async function loadAnnouncement(){
     if(age<15000) runTacoRain();
     return;
   }
+  if(data.style==="fun"){
+    b.classList.add("hidden");
+    const age=Date.now()-new Date(data.created_at).getTime();
+    if(age<10000 && data.message.startsWith("GLOBAL_FUN:")) runGlobalFun(data.message.split(":")[1]);
+    return;
+  }
   const age=Date.now()-new Date(data.created_at).getTime();
   if(age>=10000){b.classList.add("hidden");return}
   b.textContent=(data.style==="important"?"🚨 ":data.style==="party"?"🎉 ":"📢 ")+data.message;
@@ -2468,6 +2487,34 @@ function runTacoRain(){
   };
   spawn(); setTimeout(()=>layer.innerHTML="",15500);
 }
+function runGlobalFun(kind){
+  const layer=document.getElementById("globalFunLayer"); if(!layer)return;
+  layer.innerHTML="";
+  if(kind==="disco"){
+    document.body.classList.add("disco-global");
+    setTimeout(()=>document.body.classList.remove("disco-global"),10000);
+    return;
+  }
+  const chars={confetti:["🎊","🎉","✨","🎈"],money:["💸","💵","🪙"],snow:["❄️","❅","❆"]}[kind]||["✨"];
+  const end=Date.now()+10000;
+  const spawn=()=>{
+    if(Date.now()>=end)return;
+    const d=document.createElement("div");d.className="fun-drop";
+    d.textContent=chars[Math.floor(Math.random()*chars.length)];
+    d.style.left=(Math.random()*97)+"%";
+    d.style.fontSize=(22+Math.random()*34)+"px";
+    d.style.animationDuration=(2+Math.random()*3)+"s";
+    layer.appendChild(d);setTimeout(()=>d.remove(),5200);
+    setTimeout(spawn,80+Math.random()*150);
+  };spawn();setTimeout(()=>layer.innerHTML="",10500);
+}
+async function startGlobalFun(kind){
+  if(currentUser?.id!==DEV_ID)return;
+  const {error}=await supabaseClient.from("announcements").insert({message:"GLOBAL_FUN:"+kind,style:"fun",created_by:currentUser.id});
+  if(error){showToast("Could not start event: "+error.message);return}
+  runGlobalFun(kind);showToast("Global event started!");
+}
+
 async function startTacoTuesday(){
   if(currentUser?.id!==DEV_ID)return;
   const {error}=await supabaseClient.from("announcements").insert({message:"TACO_TUESDAY",style:"taco",created_by:currentUser.id});
