@@ -864,6 +864,17 @@
     </section>
 
 
+    <!-- PUBLIC CHAT -->
+    <section id="publicchatPage" class="page">
+      <div class="card">
+        <h2>🌍 Public Trade Chat</h2>
+        <p class="muted">Everyone on Carr Hill Trading can chat here. Keep personal info like your real name, location and contact details private.</p><br>
+        <div id="publicChatBox" class="chat-box"><p class="muted">Loading public chat...</p></div>
+        <input id="publicChatInput" maxlength="300" placeholder="Message everyone..." onkeydown="if(event.key==='Enter')sendPublicMessage()">
+        <button class="primary" onclick="sendPublicMessage()">Send to Public Chat</button>
+      </div>
+    </section>
+
     <!-- NEGOTIATIONS -->
     <section id="negotiationsPage" class="page">
       <div class="card">
@@ -1013,7 +1024,10 @@
     </button>
 
     <button class="nav-btn" id="nav-negotiations" onclick="openPage('negotiations')">
-      <span>💬</span>Chat
+      <span>💬</span>DMs
+    </button>
+    <button class="nav-btn" id="nav-publicchat" onclick="openPage('publicchat')">
+      <span>🌍</span>Public
     </button>
 
     <button
@@ -1541,6 +1555,9 @@ function openPage(page) {
 
   if (page === "trades") {
     loadTrades();
+  }
+  if (page === "publicchat") {
+    loadPublicMessages();
   }
 }
 
@@ -2784,6 +2801,25 @@ window.addEventListener("online",()=>{updateConnectionUI();showToast("Back onlin
 window.addEventListener("offline",()=>{updateConnectionUI();showToast("Offline mode — calculator still works");});
 document.addEventListener("DOMContentLoaded",updateConnectionUI);
 
+async function loadPublicMessages(){
+  const box=document.getElementById("publicChatBox"); if(!box)return;
+  const {data,error}=await supabaseClient.from("public_messages").select("id,user_id,username,message,created_at").order("created_at",{ascending:false}).limit(100);
+  if(error){box.innerHTML='<p class="muted">Public chat unavailable.</p>';console.error(error);return}
+  const rows=(data||[]).reverse();
+  box.innerHTML=rows.length?rows.map(m=>'<div class="chat-message"><strong>'+escapeHTML(m.user_id===DEV_ID?"ilikebeagles12346":(m.username||"User"))+(m.user_id===DEV_ID?' 🔨':'')+'</strong><div>'+escapeHTML(m.message)+'</div><small class="muted">'+new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+'</small></div>').join(""):'<p class="muted">No messages yet — start the chat 👋</p>';
+  box.scrollTop=box.scrollHeight;
+}
+async function sendPublicMessage(){
+  if(!currentUser)return;
+  if(!navigator.onLine)return showToast("You need internet to use public chat");
+  const input=document.getElementById("publicChatInput"),message=input.value.trim();
+  if(!message)return;
+  const username=currentUser.id===DEV_ID?"ilikebeagles12346":(currentProfile?.username||currentUser.user_metadata?.username||"User");
+  const {error}=await supabaseClient.from("public_messages").insert({user_id:currentUser.id,username,message});
+  if(error){console.error(error);showToast("Could not send: "+error.message);return}
+  input.value="";await loadPublicMessages();
+}
+
 function setupPresence(){
   if(!currentUser)return;
   if(presenceChannel) supabaseClient.removeChannel(presenceChannel);
@@ -2832,6 +2868,7 @@ function setupRealtime() {
       if(activeChatFriend && (payload.new?.sender_id===activeChatFriend || payload.new?.receiver_id===activeChatFriend)) await loadMessages();
     })
     .on("postgres_changes",{event:"*",schema:"public",table:"announcements"},async()=>{await loadAnnouncement()})
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"public_messages"},async()=>{await loadPublicMessages()})
     .subscribe();
 }
 
