@@ -408,6 +408,39 @@
 
     /* NAV */
 
+    /* v27 — same big movement, slower cinematic timing */
+    .page.active{animation-duration:1.25s!important}
+    .page.active>.card,.page.active>.admin-grid>.card{animation-duration:1.35s!important}
+    .page.active>.card:nth-child(2){animation-delay:.14s!important}
+    .page.active>.card:nth-child(3){animation-delay:.28s!important}
+    .page.active>.card:nth-child(4){animation-delay:.42s!important}
+    header{animation-duration:7.5s!important}
+    .brand-mark,.logo{animation-duration:5.8s!important}
+    body::before{animation-duration:30s!important}
+    body::after{animation-duration:14s!important}
+    .card{transition-duration:.8s!important}
+    .card::before{animation-duration:7.5s!important}
+    .primary,.secondary,.danger{transition-duration:.55s!important}
+    .primary::after,.secondary::after{animation-duration:4.8s!important}
+    input,select,textarea{transition-duration:.45s!important}
+    .trade-side{animation-duration:6.5s!important}
+    .trade-result{animation-duration:3.8s!important}
+    .trade-total{animation-duration:3.2s!important}
+    .item-row,.friend-result,.friend-card,.chat-message{transition-duration:.65s!important}
+    #publicChatBox .chat-message:last-child,#chatBox .chat-message:last-child{animation-duration:1s!important}
+    .bottom-nav{animation-duration:1.15s!important}
+    .bottom-nav::before{animation-duration:3.2s!important}
+    .nav-btn{transition-duration:.6s!important}
+    .nav-btn.active span{animation-duration:2.8s!important}
+    #weeklySpotlight:not(.hidden){animation-duration:4.8s!important}
+    #tradeLeaderboard .item-row:nth-child(1){animation-duration:3.2s!important}
+    #onlineCount{animation-duration:3.2s!important}
+    #toast{animation-duration:3s!important}
+    @media(max-width:600px){
+      .page.active{animation-duration:1.15s!important}
+      .trade-side{animation-duration:7s!important}
+    }
+    
     /* v26 FULL MOTION — deliberately bold, smooth and obvious */
     html{scroll-behavior:smooth}
     body{perspective:1200px}
