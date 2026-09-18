@@ -2418,7 +2418,30 @@ async function loadAnnouncement(){
     b.textContent="";
   },Math.max(0,10000-age));
 }
+function playTacoJingle(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return;
+    const ctx=new AC();
+    const notes=[523.25,659.25,783.99,659.25,698.46,880,783.99,659.25];
+    const start=ctx.currentTime;
+    for(let bar=0;bar<15;bar++){
+      notes.forEach((freq,i)=>{
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.type=i%2?"triangle":"sine";
+        o.frequency.value=freq;
+        const t=start+bar+(i*0.12);
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.055,t+0.015);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.105);
+        o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+0.12);
+      });
+    }
+    setTimeout(()=>ctx.close().catch(()=>{}),16000);
+  }catch(e){console.warn("Taco jingle unavailable",e)}
+}
 function runTacoRain(){
+  playTacoJingle();
   const layer=document.getElementById("tacoRain"); if(!layer)return;
   layer.innerHTML="";
   const end=Date.now()+15000;
