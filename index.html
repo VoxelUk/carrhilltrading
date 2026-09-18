@@ -3,25 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Carr Hill Trading</title>
+
+<meta name="theme-color" content="#080808">
+<meta name="description" content="Carr Hill Trading">
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root{
-    --bg:#06070a;
-    --card:rgba(17,19,25,.72);
-    --card2:rgba(24,27,35,.82);
-    --border:rgba(255,255,255,.09);
-    --text:#f7f8fb;
-    --muted:#8e96a8;
-    --red:#ff3048;
-    --red2:#9e071d;
-    --green:#45e39a;
-    --blue:#5da9ff;
-    --gold:#ffd166;
+    --bg:#060606;
+    --panel:#101010;
+    --panel2:#151515;
+    --red:#ff1744;
+    --red2:#ff4d6d;
+    --text:#f7f7f7;
+    --muted:#858585;
+    --border:rgba(255,255,255,.08);
+    --green:#39e58c;
 }
 
 *{
     box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
 html{
@@ -29,548 +36,375 @@ html{
 }
 
 body{
-    margin:0;
-    min-height:100vh;
-    color:var(--text);
-    font-family:
-        Inter,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
-
+    font-family:Inter,Arial,sans-serif;
     background:
-        radial-gradient(
-            circle at 10% 5%,
-            rgba(255,48,72,.13),
-            transparent 28%
-        ),
-        radial-gradient(
-            circle at 90% 15%,
-            rgba(90,120,255,.10),
-            transparent 25%
-        ),
-        linear-gradient(
-            135deg,
-            #050608,
-            #0b0d12 50%,
-            #050608
-        );
-
+        radial-gradient(circle at 20% 10%,rgba(255,23,68,.10),transparent 30%),
+        radial-gradient(circle at 80% 80%,rgba(255,23,68,.06),transparent 30%),
+        var(--bg);
+    color:var(--text);
+    min-height:100vh;
     overflow-x:hidden;
 }
 
-/* MOVING GRID */
-
-body::before{
+body:before{
     content:"";
     position:fixed;
     inset:0;
-    z-index:-5;
-
-    background-image:
-        linear-gradient(
-            rgba(255,255,255,.025) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,.025) 1px,
-            transparent 1px
-        );
-
-    background-size:45px 45px;
-
-    animation:gridMove 20s linear infinite;
-
-    mask-image:
-        linear-gradient(
-            to bottom,
-            black,
-            transparent 90%
-        );
-}
-
-@keyframes gridMove{
-    from{
-        transform:translate(0,0);
-    }
-
-    to{
-        transform:translate(45px,45px);
-    }
-}
-
-/* FLOATING GLOW */
-
-.glow{
-    position:fixed;
-    width:280px;
-    height:280px;
-    border-radius:50%;
-    filter:blur(80px);
-    opacity:.18;
     pointer-events:none;
-    z-index:-4;
+    background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+    background-size:45px 45px;
+    mask-image:linear-gradient(to bottom,black,transparent);
 }
 
-.glow.red{
-    background:#ff1f3d;
-    left:-120px;
-    top:15%;
-    animation:floatRed 11s ease-in-out infinite;
+button,input,select{
+    font:inherit;
 }
 
-.glow.blue{
-    background:#5d6cff;
-    right:-130px;
-    bottom:5%;
-    animation:floatBlue 14s ease-in-out infinite;
+button{
+    cursor:pointer;
 }
 
-@keyframes floatRed{
-    0%,100%{
-        transform:translate(0,0);
-    }
-
-    50%{
-        transform:translate(130px,80px);
-    }
-}
-
-@keyframes floatBlue{
-    0%,100%{
-        transform:translate(0,0);
-    }
-
-    50%{
-        transform:translate(-100px,-80px);
-    }
-}
-
-.container{
-    width:min(1150px,calc(100% - 24px));
+.app{
+    width:min(1180px,94%);
     margin:auto;
+    padding-bottom:110px;
 }
 
 /* HEADER */
 
 header{
-    padding:32px 0 20px;
-}
-
-.brand{
     display:flex;
+    justify-content:space-between;
     align-items:center;
-    gap:14px;
+    padding:24px 0;
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:rgba(6,6,6,.78);
+    backdrop-filter:blur(18px);
 }
 
 .logo{
-    width:55px;
-    height:55px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
 
+.logo-icon{
+    width:44px;
+    height:44px;
+    border-radius:14px;
     display:grid;
     place-items:center;
-
-    border-radius:17px;
-
-    font-size:27px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #ff465c,
-            #8c0019
-        );
-
-    border:1px solid rgba(255,255,255,.15);
-
-    box-shadow:
-        0 15px 40px rgba(255,40,65,.25),
-        inset 0 1px 0 rgba(255,255,255,.2);
-
-    animation:logoFloat 3s ease-in-out infinite;
+    background:linear-gradient(135deg,#ff1744,#8d001f);
+    box-shadow:0 0 30px rgba(255,23,68,.25);
+    font-size:22px;
 }
 
-@keyframes logoFloat{
-    0%,100%{
-        transform:translateY(0);
-    }
-
-    50%{
-        transform:translateY(-4px);
-    }
+.logo h1{
+    font-size:18px;
+    letter-spacing:-.5px;
 }
 
-.brand h1{
-    margin:0;
-
-    font-size:
-        clamp(28px,5vw,43px);
-
-    letter-spacing:-1.8px;
-}
-
-.brand p{
-    margin:5px 0 0;
-
+.logo p{
     color:var(--muted);
+    font-size:11px;
+    margin-top:2px;
+}
 
-    font-size:13px;
+.header-actions{
+    display:flex;
+    gap:8px;
+}
+
+.icon-btn{
+    width:42px;
+    height:42px;
+    border:1px solid var(--border);
+    background:#101010;
+    color:white;
+    border-radius:13px;
+}
+
+/* PAGES */
+
+.page{
+    display:none;
+    animation:pageIn .3s ease;
+}
+
+.page.active{
+    display:block;
+}
+
+@keyframes pageIn{
+    from{
+        opacity:0;
+        transform:translateY(8px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
 }
 
 /* HERO */
 
 .hero{
-    position:relative;
-    overflow:hidden;
-
-    padding:20px;
-
-    margin-bottom:16px;
-
-    border-radius:22px;
-
-    border:1px solid var(--border);
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,.055),
-            rgba(255,255,255,.015)
-        );
-
-    backdrop-filter:blur(20px);
-
-    box-shadow:
-        0 25px 70px rgba(0,0,0,.4);
+    padding:48px 0 30px;
 }
 
-.hero::after{
-    content:"";
-
-    position:absolute;
-
-    width:250px;
-    height:250px;
-
-    right:-110px;
-    bottom:-160px;
-
-    border-radius:50%;
-
-    border:1px solid rgba(255,255,255,.08);
-
-    box-shadow:
-        0 0 0 35px rgba(255,255,255,.02),
-        0 0 0 70px rgba(255,255,255,.012);
-
-    animation:spin 18s linear infinite;
+.hero h2{
+    font-size:clamp(38px,7vw,72px);
+    line-height:.95;
+    letter-spacing:-4px;
+    max-width:750px;
 }
 
-@keyframes spin{
-    to{
-        transform:rotate(360deg);
-    }
+.hero h2 span{
+    color:var(--red);
 }
 
-.hero-row{
-    display:flex;
-
-    justify-content:space-between;
-    align-items:center;
-
-    gap:15px;
-
-    flex-wrap:wrap;
+.hero p{
+    color:var(--muted);
+    margin-top:18px;
+    max-width:600px;
+    line-height:1.6;
 }
 
 .status{
-    display:flex;
+    display:inline-flex;
     align-items:center;
-    gap:9px;
-
-    width:max-content;
-
-    padding:10px 14px;
-
-    border-radius:12px;
-
-    background:rgba(0,0,0,.25);
-
+    gap:8px;
+    margin-top:24px;
+    padding:8px 12px;
+    border-radius:100px;
+    background:#101010;
     border:1px solid var(--border);
-
     font-size:12px;
-
-    font-weight:800;
 }
 
-.dot{
-    width:9px;
-    height:9px;
-
+.status-dot{
+    width:7px;
+    height:7px;
     border-radius:50%;
-
     background:var(--green);
-
-    animation:pulse 2s infinite;
+    box-shadow:0 0 12px var(--green);
 }
 
-.status.out .dot{
+/* CARDS */
+
+.card{
+    background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:22px;
+    box-shadow:0 20px 70px rgba(0,0,0,.25);
+}
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.section-title h3{
+    font-size:18px;
+}
+
+.section-title span{
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* NAV TABS */
+
+.tabs{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    margin:15px 0 28px;
+    scrollbar-width:none;
+}
+
+.tabs::-webkit-scrollbar{
+    display:none;
+}
+
+.tab{
+    white-space:nowrap;
+    border:1px solid var(--border);
+    background:#0d0d0d;
+    color:#aaa;
+    padding:10px 15px;
+    border-radius:12px;
+}
+
+.tab.active{
+    color:white;
     background:var(--red);
+    border-color:var(--red);
 }
 
-@keyframes pulse{
-    0%{
-        box-shadow:0 0 0 0 rgba(69,227,154,.5);
-    }
+/* AUTH */
 
-    70%{
-        box-shadow:0 0 0 10px rgba(69,227,154,0);
-    }
-
-    100%{
-        box-shadow:0 0 0 0 rgba(69,227,154,0);
-    }
+.auth-wrap{
+    min-height:70vh;
+    display:grid;
+    place-items:center;
 }
 
-.clock{
+.auth{
+    width:min(440px,100%);
+}
+
+.auth-logo{
+    text-align:center;
+    margin-bottom:24px;
+}
+
+.auth-logo .logo-icon{
+    display:inline-grid;
+}
+
+.auth h2{
+    text-align:center;
+    margin-top:15px;
+    font-size:30px;
+}
+
+.auth-sub{
+    text-align:center;
     color:var(--muted);
     font-size:13px;
+    margin:8px 0 24px;
 }
 
-.hero-sub{
-    margin-top:11px;
+.field{
+    margin-bottom:13px;
+}
 
-    color:#777f91;
-
+.field label{
+    display:block;
+    color:#aaa;
     font-size:12px;
+    margin-bottom:7px;
+}
+
+.field input,
+.field select{
+    width:100%;
+    padding:14px;
+    border-radius:13px;
+    border:1px solid var(--border);
+    outline:none;
+    color:white;
+    background:#090909;
+}
+
+.field input:focus,
+.field select:focus{
+    border-color:rgba(255,23,68,.7);
+    box-shadow:0 0 0 3px rgba(255,23,68,.08);
+}
+
+.primary{
+    width:100%;
+    border:0;
+    background:linear-gradient(135deg,#ff1744,#c90032);
+    color:white;
+    padding:14px;
+    border-radius:14px;
+    font-weight:700;
+    margin-top:6px;
+    box-shadow:0 10px 30px rgba(255,23,68,.18);
+}
+
+.secondary{
+    border:1px solid var(--border);
+    background:#111;
+    color:white;
+    padding:11px 15px;
+    border-radius:12px;
+}
+
+.text-button{
+    border:0;
+    background:none;
+    color:#ff4d6d;
+    margin-top:15px;
+    width:100%;
 }
 
 /* TRADE */
 
 .trade-grid{
     display:grid;
-
-    grid-template-columns:
-        repeat(2,minmax(0,1fr));
-
-    gap:16px;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
 }
 
-.panel{
-    position:relative;
-    overflow:hidden;
-
-    padding:18px;
-
-    border-radius:21px;
-
-    background:var(--card);
-
-    border:1px solid var(--border);
-
-    backdrop-filter:blur(20px);
-
-    box-shadow:
-        0 25px 70px rgba(0,0,0,.38);
-
-    transition:
-        transform .25s ease,
-        border-color .25s ease;
+.trade-side{
+    min-height:300px;
 }
 
-.panel:hover{
-    transform:translateY(-3px);
-
-    border-color:
-        rgba(255,255,255,.14);
-}
-
-.panel::before{
-    content:"";
-
-    position:absolute;
-
-    inset:0;
-
-    pointer-events:none;
-
-    background:
-        linear-gradient(
-            120deg,
-            rgba(255,255,255,.04),
-            transparent 35%
-        );
-}
-
-.panel-head{
+.trade-header{
     display:flex;
-
+    align-items:center;
     justify-content:space-between;
-    align-items:center;
-
-    gap:10px;
-
-    margin-bottom:13px;
+    margin-bottom:18px;
 }
 
-.panel-title{
+.trade-user{
     display:flex;
-
     align-items:center;
-
-    gap:11px;
+    gap:10px;
 }
 
-.panel-icon{
-    width:43px;
-    height:43px;
-
+.avatar{
+    width:38px;
+    height:38px;
+    border-radius:12px;
     display:grid;
     place-items:center;
-
-    border-radius:13px;
-
-    background:
-        rgba(255,255,255,.05);
-
-    border:
-        1px solid rgba(255,255,255,.08);
-
-    font-size:20px;
+    background:#1d1d1d;
 }
 
-.panel h2{
-    margin:0;
-
-    font-size:18px;
-}
-
-.panel-sub{
-    margin-top:3px;
-
-    color:var(--muted);
-
-    font-size:11px;
-}
-
-.clear{
-    border:1px solid var(--border);
-
-    background:rgba(255,255,255,.04);
-
-    color:#aeb5c4;
-
-    border-radius:9px;
-
-    padding:8px 10px;
-
-    font-size:10px;
-
-    font-weight:900;
-
-    cursor:pointer;
-
-    transition:.2s;
-}
-
-.clear:hover{
-    background:
-        rgba(255,48,72,.12);
-
-    color:white;
-
-    border-color:
-        rgba(255,48,72,.3);
-}
-
-/* ITEMS */
-
-.trade-list{
-    min-height:165px;
-
+.trade-items{
     display:flex;
-
     flex-direction:column;
-
     gap:8px;
+    min-height:120px;
 }
 
 .empty{
-    min-height:158px;
-
     display:grid;
-
     place-items:center;
-
+    min-height:110px;
+    color:#555;
     text-align:center;
-
-    color:#697181;
-
-    border:
-        1px dashed
-        rgba(255,255,255,.08);
-
-    border-radius:14px;
-
-    background:
-        rgba(0,0,0,.12);
+    font-size:13px;
 }
 
-.empty-icon{
-    font-size:28px;
-}
-
-.empty-text{
-    margin-top:6px;
-
-    font-size:12px;
-}
-
-.trade-item{
-    display:grid;
-
-    grid-template-columns:
-        auto 1fr auto auto;
-
+.item{
+    display:flex;
     align-items:center;
-
     gap:10px;
-
-    padding:10px;
-
+    padding:11px;
+    border:1px solid var(--border);
+    background:#0b0b0b;
     border-radius:14px;
-
-    background:
-        rgba(255,255,255,.045);
-
-    border:
-        1px solid
-        rgba(255,255,255,.065);
-
-    animation:itemIn .3s ease both;
-
-    transition:.2s;
-}
-
-.trade-item:hover{
-    background:
-        rgba(255,255,255,.07);
-
-    transform:translateX(2px);
+    animation:itemIn .25s ease;
 }
 
 @keyframes itemIn{
     from{
         opacity:0;
-        transform:
-            translateY(8px)
-            scale(.98);
+        transform:translateY(5px);
     }
-
     to{
         opacity:1;
         transform:none;
@@ -578,618 +412,335 @@ header{
 }
 
 .item-icon{
-    width:40px;
-    height:40px;
-
+    width:38px;
+    height:38px;
     display:grid;
     place-items:center;
-
     border-radius:11px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.10),
-            rgba(255,255,255,.025)
-        );
-
-    border:
-        1px solid
-        rgba(255,255,255,.08);
-
-    font-size:19px;
+    background:#171717;
+    font-size:20px;
 }
 
-.item-name{
+.item-info{
+    flex:1;
+}
+
+.item-info strong{
+    display:block;
     font-size:13px;
-
-    font-weight:850;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
 }
 
-.item-meta{
-    display:flex;
-
-    gap:7px;
-
-    align-items:center;
-
-    margin-top:4px;
-
+.item-info small{
     color:var(--muted);
-
-    font-size:10px;
 }
 
-.rarity{
-    padding:3px 6px;
-
-    border-radius:999px;
-
-    background:
-        rgba(255,255,255,.045);
-
-    border:
-        1px solid
-        rgba(255,255,255,.08);
-
-    font-size:8px;
-
-    font-weight:900;
-
-    text-transform:uppercase;
-
-    letter-spacing:.5px;
-}
-
-.line-value{
-    font-size:14px;
-
-    font-weight:950;
-
-    white-space:nowrap;
+.item-price{
+    font-size:13px;
+    font-weight:700;
 }
 
 .remove{
-    width:30px;
-    height:30px;
-
+    border:0;
+    background:#191919;
+    color:#888;
+    width:28px;
+    height:28px;
     border-radius:9px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.07);
-
-    background:
-        rgba(255,48,72,.09);
-
-    color:#ff7180;
-
-    cursor:pointer;
-
-    transition:.2s;
 }
 
-.remove:hover{
-    background:
-        rgba(255,48,72,.2);
-
-    color:white;
-
-    transform:
-        scale(1.08)
-        rotate(5deg);
+.trade-total{
+    display:flex;
+    justify-content:space-between;
+    border-top:1px solid var(--border);
+    margin-top:16px;
+    padding-top:16px;
+    font-weight:700;
 }
-
-/* CONTROLS */
 
 .controls{
     display:grid;
-
-    grid-template-columns:
-        1fr 70px 60px;
-
-    gap:7px;
-
-    margin-top:13px;
+    grid-template-columns:1fr 90px auto;
+    gap:8px;
+    margin-top:15px;
 }
 
-select,
-input{
-    width:100%;
-
-    padding:11px;
-
-    border-radius:10px;
-
-    border:
-        1px solid
-        var(--border);
-
-    background:#080a0f;
-
+.controls select,
+.controls input{
+    min-width:0;
+    border:1px solid var(--border);
+    background:#0b0b0b;
     color:white;
-
-    outline:none;
-
-    font:inherit;
-
-    transition:.2s;
-}
-
-select:focus,
-input:focus{
-    border-color:
-        rgba(255,48,72,.55);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(255,48,72,.08);
+    border-radius:12px;
+    padding:11px;
 }
 
 .add{
     border:0;
-
-    border-radius:10px;
-
+    background:var(--red);
     color:white;
-
-    font-weight:950;
-
-    cursor:pointer;
-
-    background:
-        linear-gradient(
-            135deg,
-            #ff3e53,
-            #980017
-        );
-
-    box-shadow:
-        0 10px 25px
-        rgba(255,48,72,.18);
-
-    transition:.2s;
-}
-
-.add:hover{
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 15px 32px
-        rgba(255,48,72,.28);
-}
-
-.total-row{
-    display:flex;
-
-    align-items:end;
-
-    justify-content:space-between;
-
-    margin-top:15px;
-}
-
-.total-label{
-    color:var(--muted);
-
-    font-size:10px;
-
-    font-weight:900;
-
-    text-transform:uppercase;
-
-    letter-spacing:1px;
-}
-
-.total{
-    font-size:27px;
-
-    font-weight:950;
-
-    letter-spacing:-.8px;
+    border-radius:12px;
+    padding:0 16px;
+    font-weight:700;
 }
 
 /* RESULT */
 
 .result{
-    position:relative;
-
-    overflow:hidden;
-
-    margin-top:16px;
-
-    padding:19px;
-
-    border-radius:21px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,.055),
-            rgba(255,255,255,.015)
-        );
-
-    border:
-        1px solid
-        var(--border);
-
-    box-shadow:
-        0 25px 70px rgba(0,0,0,.35);
+    margin-top:18px;
+    text-align:center;
 }
 
-.result-title{
-    font-size:21px;
-
-    font-weight:950;
+.result-main{
+    font-size:25px;
+    font-weight:800;
 }
 
-.result-note{
-    margin-top:4px;
-
+.result-sub{
     color:var(--muted);
-
-    font-size:11px;
-}
-
-.result-top{
-    display:flex;
-
-    align-items:start;
-
-    justify-content:space-between;
-
-    gap:15px;
-
-    flex-wrap:wrap;
-}
-
-.diff{
-    text-align:right;
-}
-
-.diff small{
-    display:block;
-
-    color:var(--muted);
-
-    font-size:9px;
-
-    text-transform:uppercase;
-
-    letter-spacing:1px;
-}
-
-.diff strong{
-    font-size:18px;
+    margin-top:7px;
 }
 
 .meter{
-    height:9px;
-
-    margin-top:16px;
-
-    border-radius:99px;
-
+    height:7px;
+    background:#1a1a1a;
+    border-radius:100px;
+    margin-top:18px;
     overflow:hidden;
-
-    background:#090b10;
-
-    border:
-        1px solid
-        rgba(255,255,255,.06);
 }
 
 .meter-fill{
     height:100%;
-
     width:50%;
-
-    border-radius:inherit;
-
-    background:
-        linear-gradient(
-            90deg,
-            #5da9ff,
-            #45e39a 50%,
-            #ffd166
-        );
-
-    transition:
-        width .5s
-        cubic-bezier(.2,.8,.2,1);
-}
-
-.meter-labels{
-    display:flex;
-
-    justify-content:space-between;
-
-    margin-top:6px;
-
-    color:#656d7d;
-
-    font-size:8px;
-
-    text-transform:uppercase;
+    background:linear-gradient(90deg,#ff1744,#ff7b93);
+    transition:width .5s ease;
 }
 
 /* VALUES */
 
 .values{
-    margin-top:16px;
+    margin-top:18px;
 }
 
-.values-head{
+.value-row{
     display:flex;
-
-    align-items:end;
-
-    justify-content:space-between;
-
-    gap:12px;
-
-    margin-bottom:10px;
-}
-
-.values h2{
-    margin:0;
-
-    font-size:18px;
-}
-
-.values p{
-    margin:4px 0 0;
-
-    color:var(--muted);
-
-    font-size:11px;
-}
-
-.search{
-    max-width:260px;
-}
-
-.value-grid{
-    display:grid;
-
-    grid-template-columns:
-        repeat(2,minmax(0,1fr));
-
-    gap:9px;
-}
-
-.value-card{
-    display:flex;
-
     align-items:center;
-
-    gap:10px;
-
-    padding:11px;
-
-    border-radius:15px;
-
-    background:var(--card);
-
-    border:
-        1px solid
-        var(--border);
-
-    transition:.2s;
-
-    animation:fadeUp .3s both;
+    gap:12px;
+    padding:13px 0;
+    border-bottom:1px solid rgba(255,255,255,.05);
 }
 
-.value-card:hover{
-    transform:translateY(-2px);
-
-    background:var(--card2);
-
-    border-color:
-        rgba(255,255,255,.14);
+.value-row:last-child{
+    border-bottom:0;
 }
 
 .value-icon{
-    width:39px;
-    height:39px;
-
+    width:38px;
+    height:38px;
     display:grid;
     place-items:center;
-
-    flex-shrink:0;
-
-    border-radius:10px;
-
-    background:
-        rgba(255,255,255,.05);
-
-    border:
-        1px solid
-        rgba(255,255,255,.07);
-
-    font-size:18px;
-}
-
-.value-main{
-    min-width:0;
-
-    flex:1;
+    background:#161616;
+    border-radius:11px;
 }
 
 .value-name{
-    font-size:12px;
-
-    font-weight:850;
+    flex:1;
 }
 
-.value-sub{
-    margin-top:3px;
+.value-name strong{
+    display:block;
+}
 
+.value-name small{
     color:var(--muted);
-
-    font-size:9px;
 }
 
-.value-price{
+.value-number{
     text-align:right;
-
-    white-space:nowrap;
 }
 
-.current{
-    font-size:14px;
-
-    font-weight:950;
+.value-number strong{
+    display:block;
 }
 
-.old{
-    margin-top:2px;
-
-    color:#687082;
-
-    font-size:8px;
+.value-number small{
+    color:var(--muted);
 }
 
-.unavailable{
-    opacity:.45;
-}
+/* FRIENDS */
 
-/* TICKER */
-
-.ticker{
-    margin:
-        22px 0 26px;
-
-    overflow:hidden;
-
-    border-top:
-        1px solid
-        rgba(255,255,255,.06);
-
-    border-bottom:
-        1px solid
-        rgba(255,255,255,.06);
-}
-
-.ticker-track{
-    width:max-content;
-
+.search{
     display:flex;
-
-    gap:38px;
-
-    padding:10px 0;
-
-    animation:
-        ticker 24s linear infinite;
+    gap:8px;
+    margin-bottom:15px;
 }
 
-.ticker-item{
-    color:#8991a2;
-
-    font-size:10px;
-
-    font-weight:800;
-}
-
-.ticker-item b{
+.search input{
+    flex:1;
+    padding:13px;
+    border-radius:13px;
+    border:1px solid var(--border);
+    background:#0b0b0b;
     color:white;
+    outline:none;
 }
 
-@keyframes ticker{
-    from{
-        transform:translateX(0);
-    }
-
-    to{
-        transform:translateX(-50%);
-    }
+.friend{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 0;
+    border-bottom:1px solid rgba(255,255,255,.05);
 }
 
-.footer{
-    padding-bottom:30px;
+.friend-info{
+    flex:1;
+}
 
+.friend-info strong{
+    display:block;
+}
+
+.friend-info small{
+    color:var(--muted);
+}
+
+/* PROFILE */
+
+.profile{
     text-align:center;
-
-    color:#555d6d;
-
-    font-size:9px;
 }
 
-/* MOBILE */
+.profile-avatar{
+    width:82px;
+    height:82px;
+    border-radius:25px;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,#ff1744,#650018);
+    margin:5px auto 15px;
+    font-size:34px;
+}
 
-@media(max-width:800px){
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:22px;
+}
+
+.stat{
+    padding:17px 8px;
+    border:1px solid var(--border);
+    border-radius:15px;
+    background:#0c0c0c;
+}
+
+.stat strong{
+    display:block;
+    font-size:20px;
+}
+
+.stat small{
+    color:var(--muted);
+}
+
+/* BOTTOM NAV */
+
+.bottom-nav{
+    position:fixed;
+    bottom:14px;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(560px,92%);
+    padding:8px;
+    background:rgba(15,15,15,.88);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    border-radius:20px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    z-index:50;
+    box-shadow:0 15px 50px rgba(0,0,0,.45);
+}
+
+.nav-btn{
+    border:0;
+    background:none;
+    color:#777;
+    padding:10px 5px;
+    border-radius:14px;
+    font-size:11px;
+}
+
+.nav-btn span{
+    display:block;
+    font-size:19px;
+    margin-bottom:3px;
+}
+
+.nav-btn.active{
+    color:white;
+    background:#1a1a1a;
+}
+
+/* TOAST */
+
+.toast{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translate(-50%,-20px);
+    opacity:0;
+    pointer-events:none;
+    z-index:100;
+    background:#171717;
+    border:1px solid var(--border);
+    padding:12px 17px;
+    border-radius:13px;
+    transition:.25s;
+    font-size:13px;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:760px){
+    .app{
+        width:92%;
+    }
+
+    header{
+        padding:15px 0;
+    }
+
+    .hero{
+        padding-top:30px;
+    }
+
+    .hero h2{
+        letter-spacing:-2px;
+    }
 
     .trade-grid{
         grid-template-columns:1fr;
     }
 
-    .value-grid{
-        grid-template-columns:1fr;
-    }
-}
-
-@media(max-width:560px){
-
-    .container{
-        width:
-            calc(100% - 16px);
-    }
-
-    header{
-        padding-top:20px;
-    }
-
-    .hero{
-        padding:15px;
-
-        border-radius:18px;
-    }
-
-    .panel,
-    .result{
-        border-radius:18px;
-
-        padding:14px;
-    }
-
     .controls{
-        grid-template-columns:
-            1fr 65px 58px;
+        grid-template-columns:1fr 75px;
     }
 
-    .trade-item{
-        grid-template-columns:
-            auto 1fr auto;
+    .add{
+        grid-column:1/-1;
+        padding:12px;
     }
 
-    .line-value{
-        grid-column:2;
-    }
-
-    .remove{
-        grid-column:3;
-
-        grid-row:
-            1 / span 2;
-    }
-
-    .diff{
-        text-align:left;
-    }
-
-    .total{
-        font-size:24px;
-    }
-
-    .brand h1{
-        font-size:27px;
+    .card{
+        padding:17px;
+        border-radius:19px;
     }
 }
 </style>
@@ -1197,1298 +748,991 @@ input:focus{
 
 <body>
 
-<div class="glow red"></div>
-<div class="glow blue"></div>
+<div id="toast" class="toast"></div>
 
-<div class="container">
+<div class="app">
 
 <header>
-
-    <div class="brand">
-
-        <div class="logo">
-            🏫
-        </div>
-
+    <div class="logo">
+        <div class="logo-icon">🏫</div>
         <div>
-
-            <h1>
-                Carr Hill Trading
-            </h1>
-
-            <p>
-                School item trading calculator
-            </p>
-
+            <h1>Carr Hill Trading</h1>
+            <p>School trading network</p>
         </div>
-
     </div>
 
+    <div class="header-actions">
+        <button class="icon-btn" onclick="showPage('profile')">👤</button>
+    </div>
 </header>
 
+<!-- AUTH PAGE -->
 
-<!-- MARKET STATUS -->
+<section id="authPage" class="page active">
 
-<section class="hero">
+<div class="auth-wrap">
+<div class="auth card">
 
-    <div class="hero-row">
-
-        <div
-            class="status"
-            id="status"
-        >
-
-            <span class="dot"></span>
-
-            <span id="statusText">
-                Checking market...
-            </span>
-
-        </div>
-
-        <div
-            class="clock"
-            id="clock"
-        >
-            --:--:--
-        </div>
-
+    <div class="auth-logo">
+        <div class="logo-icon">🏫</div>
+        <h2 id="authTitle">Welcome back</h2>
+        <p class="auth-sub" id="authSubtitle">
+            Sign in to Carr Hill Trading
+        </p>
     </div>
 
-    <div
-        class="hero-sub"
-        id="heroSub"
-    >
-        Checking current market prices...
+    <div id="usernameField" class="field" style="display:none">
+        <label>Username</label>
+        <input id="username" placeholder="yourusername" maxlength="20">
     </div>
 
-</section>
-
-
-<!-- TRADE PANELS -->
-
-<section class="trade-grid">
-
-
-<!-- YOUR OFFER -->
-
-<div class="panel">
-
-    <div class="panel-head">
-
-        <div class="panel-title">
-
-            <div class="panel-icon">
-                👤
-            </div>
-
-            <div>
-
-                <h2>
-                    Your Offer
-                </h2>
-
-                <div class="panel-sub">
-                    What you're giving
-                </div>
-
-            </div>
-
-        </div>
-
-        <button
-            class="clear"
-            onclick="clearTrade('your')"
-        >
-            CLEAR
-        </button>
-
+    <div class="field">
+        <label>Email</label>
+        <input id="email" type="email" placeholder="you@example.com">
     </div>
 
-
-    <div
-        id="yourItems"
-        class="trade-list"
-    ></div>
-
-
-    <div class="controls">
-
-        <select
-            id="yourSelect"
-        ></select>
-
-        <input
-            id="yourQuantity"
-            type="number"
-            min="1"
-            max="99"
-            value="1"
-        >
-
-        <button
-            class="add"
-            onclick="addItem('your')"
-        >
-            ADD
-        </button>
-
+    <div class="field">
+        <label>Password</label>
+        <input id="password" type="password" placeholder="••••••••">
     </div>
 
+    <button class="primary" onclick="submitAuth()" id="authButton">
+        Sign in
+    </button>
 
-    <div class="total-row">
-
-        <div class="total-label">
-            Your total
-        </div>
-
-        <div
-            class="total"
-            id="yourTotal"
-        >
-            £0.00
-        </div>
-
-    </div>
+    <button class="text-button" onclick="toggleAuth()" id="authToggle">
+        Need an account? Sign up
+    </button>
 
 </div>
-
-
-<!-- THEIR OFFER -->
-
-<div class="panel">
-
-    <div class="panel-head">
-
-        <div class="panel-title">
-
-            <div class="panel-icon">
-                🤝
-            </div>
-
-            <div>
-
-                <h2>
-                    Their Offer
-                </h2>
-
-                <div class="panel-sub">
-                    What you're receiving
-                </div>
-
-            </div>
-
-        </div>
-
-        <button
-            class="clear"
-            onclick="clearTrade('their')"
-        >
-            CLEAR
-        </button>
-
-    </div>
-
-
-    <div
-        id="theirItems"
-        class="trade-list"
-    ></div>
-
-
-    <div class="controls">
-
-        <select
-            id="theirSelect"
-        ></select>
-
-        <input
-            id="theirQuantity"
-            type="number"
-            min="1"
-            max="99"
-            value="1"
-        >
-
-        <button
-            class="add"
-            onclick="addItem('their')"
-        >
-            ADD
-        </button>
-
-    </div>
-
-
-    <div class="total-row">
-
-        <div class="total-label">
-            Their total
-        </div>
-
-        <div
-            class="total"
-            id="theirTotal"
-        >
-            £0.00
-        </div>
-
-    </div>
-
 </div>
 
 </section>
 
+<!-- HOME -->
 
-<!-- RESULT -->
+<section id="homePage" class="page">
 
-<section class="result">
+<div class="hero">
+    <div class="status">
+        <span class="status-dot"></span>
+        <span id="onlineText">ONLINE</span>
+    </div>
 
-    <div class="result-top">
+    <h2>
+        Trade.<br>
+        Connect.<br>
+        <span>Repeat.</span>
+    </h2>
 
-        <div>
+    <p>
+        Trade school items with your friends, compare values
+        and keep track of your offers.
+    </p>
+</div>
 
-            <div
-                class="result-title"
-                id="resultTitle"
-            >
-                Build a trade to compare values
+<div class="card">
+    <div class="section-title">
+        <h3>Quick Trade</h3>
+        <span id="loggedUser">@guest</span>
+    </div>
+
+    <div class="trade-grid">
+
+        <div class="trade-side">
+            <div class="trade-header">
+                <div class="trade-user">
+                    <div class="avatar">👤</div>
+                    <strong>Your Offer</strong>
+                </div>
             </div>
 
-            <div
-                class="result-note"
-                id="resultNote"
-            >
-                Add items on both sides to compare them.
+            <div id="yourItems" class="trade-items"></div>
+
+            <div class="controls">
+                <select id="yourSelect"></select>
+                <input id="yourQty" type="number" min="1" value="1">
+                <button class="add" onclick="addItem('your')">ADD</button>
             </div>
 
+            <div class="trade-total">
+                <span>Total</span>
+                <span id="yourTotal">£0.00</span>
+            </div>
         </div>
 
 
-        <div class="diff">
+        <div class="trade-side">
+            <div class="trade-header">
+                <div class="trade-user">
+                    <div class="avatar">👤</div>
+                    <strong>Their Offer</strong>
+                </div>
+            </div>
 
-            <small>
-                Difference
-            </small>
+            <div id="theirItems" class="trade-items"></div>
 
-            <strong
-                id="difference"
-            >
-                £0.00
-            </strong>
+            <div class="controls">
+                <select id="theirSelect"></select>
+                <input id="theirQty" type="number" min="1" value="1">
+                <button class="add" onclick="addItem('their')">ADD</button>
+            </div>
 
+            <div class="trade-total">
+                <span>Total</span>
+                <span id="theirTotal">£0.00</span>
+            </div>
         </div>
 
     </div>
+</div>
 
+<div class="card result">
+    <div class="result-main" id="resultText">⚖️ Add some items</div>
+    <div class="result-sub" id="difference">Create an offer to compare values.</div>
 
     <div class="meter">
+        <div class="meter-fill" id="meter"></div>
+    </div>
+</div>
 
-        <div
-            class="meter-fill"
-            id="meterFill"
-        ></div>
-
+<div class="card values">
+    <div class="section-title">
+        <h3>Item Values</h3>
+        <span>Live pricing</span>
     </div>
 
-
-    <div class="meter-labels">
-
-        <span>
-            You give more
-        </span>
-
-        <span>
-            Equal
-        </span>
-
-        <span>
-            You receive more
-        </span>
-
-    </div>
+    <div id="valuesList"></div>
+</div>
 
 </section>
 
+<!-- TRADES -->
 
-<!-- VALUES -->
+<section id="tradesPage" class="page">
 
-<section class="values">
-
-    <div class="values-head">
-
-        <div>
-
-            <h2>
-                📋 Item Values
-            </h2>
-
-            <p>
-                Current values update automatically
-            </p>
-
-        </div>
-
-
-        <div class="search">
-
-            <input
-                id="search"
-                type="search"
-                placeholder="🔎 Search items..."
-                oninput="renderValues()"
-            >
-
-        </div>
-
+<div class="hero">
+    <div class="status">
+        <span class="status-dot"></span>
+        Trading
     </div>
 
+    <h2>Your<br><span>Trades.</span></h2>
+    <p>Send and receive offers from people you've connected with.</p>
+</div>
 
-    <div
-        id="valueList"
-        class="value-grid"
-    ></div>
+<div class="card">
+    <div class="section-title">
+        <h3>Incoming Offers</h3>
+        <span>0 pending</span>
+    </div>
+
+    <div class="empty">
+        🔄<br>
+        No trade offers yet.
+    </div>
+</div>
+
+<br>
+
+<div class="card">
+    <div class="section-title">
+        <h3>Trade History</h3>
+    </div>
+
+    <div class="empty">
+        📦<br>
+        Your completed trades will appear here.
+    </div>
+</div>
 
 </section>
 
+<!-- FRIENDS -->
 
-<!-- MOVING TICKER -->
+<section id="friendsPage" class="page">
 
-<div class="ticker">
+<div class="hero">
+    <div class="status">
+        <span class="status-dot"></span>
+        Social
+    </div>
 
-    <div
-        class="ticker-track"
-        id="tickerTrack"
-    ></div>
+    <h2>Your<br><span>Friends.</span></h2>
+    <p>Find people and connect with other traders.</p>
+</div>
+
+<div class="card">
+
+    <div class="search">
+        <input id="friendSearch" placeholder="Search username...">
+        <button class="add" onclick="searchUser()">SEARCH</button>
+    </div>
+
+    <div id="friendResults" class="empty">
+        🔎<br>
+        Search for a username.
+    </div>
 
 </div>
 
+<br>
 
-<div class="footer">
+<div class="card">
 
-    Carr Hill Trading · School item values · Fruit Pots unavailable
+    <div class="section-title">
+        <h3>Friends</h3>
+        <span id="friendCount">0</span>
+    </div>
+
+    <div class="empty">
+        👥<br>
+        Your friends will appear here.
+    </div>
 
 </div>
 
+</section>
+
+<!-- PROFILE -->
+
+<section id="profilePage" class="page">
+
+<div class="hero">
+    <div class="status">
+        <span class="status-dot"></span>
+        Account
+    </div>
+
+    <h2>Your<br><span>Profile.</span></h2>
 </div>
 
+<div class="card profile">
+
+    <div class="profile-avatar">👤</div>
+
+    <h2 id="profileUsername">@guest</h2>
+    <p style="color:#777;margin-top:6px" id="profileEmail"></p>
+
+    <div class="stats">
+        <div class="stat">
+            <strong>0</strong>
+            <small>Trades</small>
+        </div>
+
+        <div class="stat">
+            <strong>0</strong>
+            <small>Friends</small>
+        </div>
+
+        <div class="stat">
+            <strong>£0</strong>
+            <small>Traded</small>
+        </div>
+    </div>
+
+    <br>
+
+    <button class="secondary" onclick="signOut()">
+        Sign out
+    </button>
+
+</div>
+
+</section>
+
+</div>
+
+<!-- BOTTOM NAV -->
+
+<nav class="bottom-nav" id="bottomNav" style="display:none">
+
+<button class="nav-btn active" onclick="showPage('home')">
+    <span>🏠</span>
+    Home
+</button>
+
+<button class="nav-btn" onclick="showPage('trades')">
+    <span>🔄</span>
+    Trades
+</button>
+
+<button class="nav-btn" onclick="showPage('friends')">
+    <span>👥</span>
+    Friends
+</button>
+
+<button class="nav-btn" onclick="showPage('profile')">
+    <span>👤</span>
+    Profile
+</button>
+
+</nav>
 
 <script>
 
-/* =========================================
-   ITEMS
-========================================= */
+/* =========================================================
+   SUPABASE
+   ========================================================= */
 
-const items = [
+const SUPABASE_URL =
+    "https://spxudcbtorqlmvuqvehu.supabase.co";
 
-    {
-        name:"Radnor Fizz",
+const SUPABASE_KEY =
+    "sb_publishable_ZCLNaK7Z14mnPuhbbaGmIg_0X9kP48I";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =========================================================
+   ITEM DATA
+   ========================================================= */
+
+const items = {
+
+    "Radnor Fizz":{
         icon:"🥤",
-        rarity:"Common",
         school:1.20,
         outside:1.00
     },
 
-    {
-        name:"Sausage Rolls",
+    "Sausage Rolls":{
         icon:"🌭",
-        rarity:"Legendary",
         school:2.90,
         outside:1.50
     },
 
-    {
-        name:"Mini Doughnuts",
+    "Mini Doughnuts":{
         icon:"🍩",
-        rarity:"Rare",
         school:1.20,
         outside:2.00
     },
 
-    {
-        name:"Radnor Splash",
-        icon:"💧",
-        rarity:"Rare",
+    "Radnor Splash":{
+        icon:"🧃",
         school:2.00,
         outside:1.50
     },
 
-    {
-        name:"Radnor Fruits",
+    "Radnor Fruits":{
         icon:"🍓",
-        rarity:"Uncommon",
         school:1.00,
-        outside:0.50
+        outside:.50
     },
 
-    {
-        name:"Milkshakes",
-        icon:"🥛",
-        rarity:"Rare",
+    "Milkshakes":{
+        icon:"🥤",
         school:1.50,
         outside:2.00
     },
 
-    {
-        name:"50p 2 Litre Coke Bottle",
+    "50p 2 litre Coke bottle":{
         icon:"🥤",
-        rarity:"Epic",
         school:1.00,
-        outside:0.70
+        outside:.70
     },
 
-    {
-        name:"Popcorn",
+    "Popcorn":{
         icon:"🍿",
-        rarity:"Uncommon",
         school:1.10,
         outside:1.00
-    },
-
-    {
-        name:"Fruit Pots",
-        icon:"🍉",
-        rarity:"Unavailable",
-        school:null,
-        outside:null,
-        unavailable:true
     }
+};
 
-];
+let yourOffer = [];
+let theirOffer = [];
+
+let signupMode = false;
 
 
-let yourTrade = [];
+/* =========================================================
+   SCHOOL PRICE
+   ========================================================= */
 
-let theirTrade = [];
+function inSchool(){
 
+    const now = new Date();
+    const day = now.getDay();
 
-/* =========================================
-   SCHOOL TIME
-========================================= */
-
-function isSchoolTime(){
-
-    const now =
-        new Date();
-
-    const day =
-        now.getDay();
+    if(day === 0 || day === 6)
+        return false;
 
     const minutes =
-        now.getHours() * 60 +
+        now.getHours()*60 +
         now.getMinutes();
 
+    return minutes >= 510 && minutes <= 930;
+}
 
-    return (
-        day >= 1 &&
-        day <= 5 &&
-        minutes >= 510 &&
-        minutes <= 930
-    );
+function price(name){
 
+    return inSchool()
+        ? items[name].school
+        : items[name].outside;
 }
 
 
-/* =========================================
-   PRICE
-========================================= */
+/* =========================================================
+   TRADE CALCULATOR
+   ========================================================= */
 
-function getPrice(item){
+function populateSelects(){
 
-    if(item.unavailable){
-        return 0;
-    }
+    const options =
+        Object.keys(items)
+        .map(name =>
+            `<option value="${name}">
+                ${items[name].icon} ${name}
+            </option>`
+        )
+        .join("");
 
-    return isSchoolTime()
-        ? item.school
-        : item.outside;
+    document.getElementById("yourSelect").innerHTML =
+        options;
 
+    document.getElementById("theirSelect").innerHTML =
+        options;
 }
 
-
-/* =========================================
-   MONEY
-========================================= */
-
-function money(value){
-
-    return "£" +
-        Number(value).toFixed(2);
-
-}
-
-
-/* =========================================
-   SELECT MENUS
-========================================= */
-
-function createMenus(){
-
-    [
-        "yourSelect",
-        "theirSelect"
-    ].forEach(id=>{
-
-        const select =
-            document.getElementById(id);
-
-        select.innerHTML = "";
-
-
-        items
-            .filter(item=>!item.unavailable)
-            .forEach((item,index)=>{
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-                option.value =
-                    index;
-
-                option.textContent =
-                    item.icon +
-                    " " +
-                    item.name +
-                    " — " +
-                    money(
-                        getPrice(item)
-                    );
-
-                select.appendChild(
-                    option
-                );
-
-            });
-
-    });
-
-}
-
-
-/* =========================================
-   ADD ITEM
-========================================= */
 
 function addItem(side){
 
     const select =
-        document.getElementById(
-            side + "Select"
-        );
+        document.getElementById(side+"Select");
 
-    const input =
-        document.getElementById(
-            side + "Quantity"
-        );
+    const qtyInput =
+        document.getElementById(side+"Qty");
 
+    const name = select.value;
 
-    let quantity =
-        parseInt(
-            input.value,
-            10
-        );
+    const qty =
+        Math.max(1,parseInt(qtyInput.value)||1);
 
+    const target =
+        side === "your"
+        ? yourOffer
+        : theirOffer;
 
-    if(
-        !Number.isFinite(quantity)
-    ){
+    const existing =
+        target.find(x => x.name === name);
 
-        quantity = 1;
+    if(existing)
+        existing.qty += qty;
+    else
+        target.push({name,qty});
 
-    }
-
-
-    quantity =
-        Math.max(
-            1,
-            Math.min(
-                99,
-                quantity
-            )
-        );
-
-
-    const entry = {
-
-        index:
-            Number(select.value),
-
-        quantity:
-            quantity
-
-    };
-
-
-    if(side === "your"){
-
-        yourTrade.push(entry);
-
-    }else{
-
-        theirTrade.push(entry);
-
-    }
-
-
-    input.value = 1;
-
-
-    render();
-
+    renderOffers();
 }
 
 
-/* =========================================
-   REMOVE
-========================================= */
+function removeItem(side,index){
 
-function removeItem(
-    side,
-    index
-){
+    if(side === "your")
+        yourOffer.splice(index,1);
+    else
+        theirOffer.splice(index,1);
 
-    if(side === "your"){
-
-        yourTrade.splice(
-            index,
-            1
-        );
-
-    }else{
-
-        theirTrade.splice(
-            index,
-            1
-        );
-
-    }
-
-
-    render();
-
+    renderOffers();
 }
 
 
-/* =========================================
-   CLEAR
-========================================= */
+function renderOffers(){
 
-function clearTrade(side){
-
-    if(side === "your"){
-
-        yourTrade = [];
-
-    }else{
-
-        theirTrade = [];
-
-    }
-
-
-    render();
-
-}
-
-
-/* =========================================
-   TOTAL
-========================================= */
-
-function calculateTotal(
-    trade
-){
-
-    return trade.reduce(
-        (total,entry)=>{
-
-            const item =
-                items[
-                    entry.index
-                ];
-
-            return total +
-                getPrice(item) *
-                entry.quantity;
-
-        },
-        0
+    renderSide(
+        "your",
+        yourOffer
     );
 
+    renderSide(
+        "their",
+        theirOffer
+    );
+
+    updateResult();
 }
 
 
-/* =========================================
-   RENDER TRADE
-========================================= */
-
-function renderTrade(
-    trade,
-    elementID,
-    side
-){
+function renderSide(side,list){
 
     const container =
-        document.getElementById(
-            elementID
-        );
+        document.getElementById(side+"Items");
 
-
-    if(!trade.length){
+    if(!list.length){
 
         container.innerHTML = `
-
             <div class="empty">
-
-                <div>
-
-                    <div class="empty-icon">
-                        🛒
-                    </div>
-
-                    <div class="empty-text">
-                        Nothing added yet
-                    </div>
-
-                </div>
-
+                Nothing added yet.
             </div>
-
         `;
 
-        return;
+        document.getElementById(side+"Total")
+            .textContent = "£0.00";
 
+        return;
     }
 
+    let total = 0;
 
     container.innerHTML =
-        trade.map(
-            (entry,index)=>{
+        list.map((item,index)=>{
 
-                const item =
-                    items[
-                        entry.index
-                    ];
+            const p = price(item.name);
+            const value = p * item.qty;
 
-                const value =
-                    getPrice(item) *
-                    entry.quantity;
+            total += value;
 
+            return `
+                <div class="item">
 
-                return `
-
-                    <div
-                        class="trade-item"
-                    >
-
-                        <div class="item-icon">
-                            ${item.icon}
-                        </div>
-
-
-                        <div>
-
-                            <div class="item-name">
-                                ${item.name}
-                            </div>
-
-                            <div class="item-meta">
-
-                                <span class="rarity">
-                                    ${item.rarity}
-                                </span>
-
-                                × ${entry.quantity}
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="line-value">
-                            ${money(value)}
-                        </div>
-
-
-                        <button
-                            class="remove"
-                            onclick="removeItem(
-                                '${side}',
-                                ${index}
-                            )"
-                        >
-                            ×
-                        </button>
-
+                    <div class="item-icon">
+                        ${items[item.name].icon}
                     </div>
 
-                `;
+                    <div class="item-info">
+                        <strong>${item.name}</strong>
+                        <small>
+                            ×${item.qty} · £${p.toFixed(2)} each
+                        </small>
+                    </div>
 
-            }
-        ).join("");
+                    <div class="item-price">
+                        £${value.toFixed(2)}
+                    </div>
 
+                    <button
+                        class="remove"
+                        onclick="removeItem('${side}',${index})">
+                        ×
+                    </button>
+
+                </div>
+            `;
+
+        }).join("");
+
+    document.getElementById(side+"Total")
+        .textContent =
+        "£"+total.toFixed(2);
 }
 
 
-/* =========================================
-   RESULT
-========================================= */
+function getTotal(list){
+
+    return list.reduce(
+        (sum,item)=>
+            sum + price(item.name)*item.qty,
+        0
+    );
+}
+
 
 function updateResult(){
 
-    const yourTotal =
-        calculateTotal(
-            yourTrade
-        );
+    const a = getTotal(yourOffer);
+    const b = getTotal(theirOffer);
 
-    const theirTotal =
-        calculateTotal(
-            theirTrade
-        );
+    const diff = Math.abs(a-b);
 
+    const result =
+        document.getElementById("resultText");
 
     const difference =
-        Math.abs(
-            yourTotal -
-            theirTotal
-        );
-
-
-    document.getElementById(
-        "yourTotal"
-    ).textContent =
-        money(yourTotal);
-
-
-    document.getElementById(
-        "theirTotal"
-    ).textContent =
-        money(theirTotal);
-
-
-    document.getElementById(
-        "difference"
-    ).textContent =
-        money(difference);
-
-
-    const title =
-        document.getElementById(
-            "resultTitle"
-        );
-
-    const note =
-        document.getElementById(
-            "resultNote"
-        );
+        document.getElementById("difference");
 
     const meter =
-        document.getElementById(
-            "meterFill"
-        );
+        document.getElementById("meter");
 
+    if(a === 0 && b === 0){
 
-    if(
-        !yourTrade.length &&
-        !theirTrade.length
-    ){
+        result.textContent =
+            "⚖️ Add some items";
 
-        title.textContent =
-            "Build a trade to compare values";
+        difference.textContent =
+            "Create an offer to compare values.";
 
-        note.textContent =
-            "Add items on both sides to compare them.";
-
-        meter.style.width =
-            "50%";
+        meter.style.width = "50%";
 
         return;
-
     }
 
+    difference.textContent =
+        "Difference: £"+diff.toFixed(2);
 
-    if(difference < 0.25){
+    if(diff < .25){
 
-        title.textContent =
+        result.textContent =
             "⚖️ VERY CLOSE TRADE";
 
-        note.textContent =
-            "The two offers are within 25p.";
+    }else if(a > b){
 
-    }
-
-    else if(
-        yourTotal >
-        theirTotal
-    ){
-
-        title.textContent =
+        result.textContent =
             "📈 YOUR OFFER IS WORTH MORE";
 
-        note.textContent =
-            "Your side has the higher listed value.";
+    }else{
 
-    }
-
-    else{
-
-        title.textContent =
+        result.textContent =
             "📈 THEIR OFFER IS WORTH MORE";
-
-        note.textContent =
-            "Their side has the higher listed value.";
-
     }
 
+    const total = a+b;
 
-    const ratio =
-        (yourTotal + theirTotal) === 0
-            ? .5
-            : theirTotal /
-              (yourTotal + theirTotal);
-
+    let percentage =
+        total === 0
+        ? 50
+        : (a/total)*100;
 
     meter.style.width =
-        Math.max(
-            8,
-            Math.min(
-                92,
-                ratio * 100
-            )
-        ) + "%";
-
+        percentage+"%";
 }
 
 
-/* =========================================
-   STATUS
-========================================= */
-
-function updateStatus(){
-
-    const status =
-        document.getElementById(
-            "status"
-        );
-
-    const text =
-        document.getElementById(
-            "statusText"
-        );
-
-    const sub =
-        document.getElementById(
-            "heroSub"
-        );
-
-
-    if(isSchoolTime()){
-
-        status.classList.remove(
-            "out"
-        );
-
-        text.textContent =
-            "IN SCHOOL — SCHOOL PRICES ACTIVE";
-
-        sub.textContent =
-            "School-day values are active right now.";
-
-    }
-
-    else{
-
-        status.classList.add(
-            "out"
-        );
-
-        text.textContent =
-            "OUT OF SCHOOL — OUTSIDE PRICES ACTIVE";
-
-        sub.textContent =
-            "Outside-school values are active right now.";
-
-    }
-
-
-    document.getElementById(
-        "clock"
-    ).textContent =
-        new Date().toLocaleTimeString(
-            [],
-            {
-                hour:"2-digit",
-                minute:"2-digit",
-                second:"2-digit"
-            }
-        );
-
-}
-
-
-/* =========================================
-   VALUE LIST
-========================================= */
+/* =========================================================
+   VALUES
+   ========================================================= */
 
 function renderValues(){
 
-    const search =
-        document.getElementById(
-            "search"
-        ).value
-        .toLowerCase()
-        .trim();
+    const school = inSchool();
 
+    document.getElementById("valuesList").innerHTML =
+        Object.entries(items)
+        .map(([name,item])=>{
 
-    const list =
-        document.getElementById(
-            "valueList"
-        );
+            return `
+                <div class="value-row">
 
-
-    const filtered =
-        items.filter(
-            item =>
-                item.name
-                .toLowerCase()
-                .includes(search)
-        );
-
-
-    list.innerHTML =
-        filtered.map(
-            (item,index)=>{
-
-                if(item.unavailable){
-
-                    return `
-
-                        <div
-                            class="value-card unavailable"
-                        >
-
-                            <div class="value-icon">
-                                ${item.icon}
-                            </div>
-
-                            <div class="value-main">
-
-                                <div class="value-name">
-                                    ${item.name}
-                                </div>
-
-                                <div class="value-sub">
-                                    Not tradeable
-                                </div>
-
-                            </div>
-
-                            <div class="value-price">
-
-                                <div class="current">
-                                    UNAVAILABLE
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    `;
-
-                }
-
-
-                const current =
-                    getPrice(item);
-
-
-                return `
-
-                    <div
-                        class="value-card"
-                        style="
-                            animation-delay:
-                            ${index * 35}ms
-                        "
-                    >
-
-                        <div class="value-icon">
-                            ${item.icon}
-                        </div>
-
-
-                        <div class="value-main">
-
-                            <div class="value-name">
-                                ${item.name}
-                            </div>
-
-                            <div class="value-sub">
-                                ${item.rarity}
-                            </div>
-
-                        </div>
-
-
-                        <div class="value-price">
-
-                            <div class="current">
-                                ${money(current)}
-                            </div>
-
-                            <div class="old">
-                                School:
-                                ${money(item.school)}
-                                ·
-                                Outside:
-                                ${money(item.outside)}
-                            </div>
-
-                        </div>
-
+                    <div class="value-icon">
+                        ${item.icon}
                     </div>
 
-                `;
+                    <div class="value-name">
+                        <strong>${name}</strong>
+                        <small>
+                            ${school ? "School price" : "Outside price"}
+                        </small>
+                    </div>
 
-            }
-        ).join("");
-
-}
-
-
-/* =========================================
-   TICKER
-========================================= */
-
-function createTicker(){
-
-    const available =
-        items.filter(
-            item =>
-                !item.unavailable
-        );
-
-
-    const ticker =
-        document.getElementById(
-            "tickerTrack"
-        );
-
-
-    const list =
-        [
-            ...available,
-            ...available
-        ];
-
-
-    ticker.innerHTML =
-        list.map(
-            item => `
-
-                <div class="ticker-item">
-
-                    ${item.icon}
-
-                    <b>
-                        ${item.name}
-                    </b>
-
-                    ·
-
-                    ${money(
-                        getPrice(item)
-                    )}
+                    <div class="value-number">
+                        <strong>
+                            £${price(name).toFixed(2)}
+                        </strong>
+                        <small>
+                            ${school
+                                ? "£"+item.outside.toFixed(2)+" outside"
+                                : "£"+item.school.toFixed(2)+" school"}
+                        </small>
+                    </div>
 
                 </div>
+            `;
 
-            `
-        ).join("");
-
+        }).join("");
 }
 
 
-/* =========================================
-   RENDER
-========================================= */
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
 
-function render(){
+function showPage(name){
 
-    renderTrade(
-        yourTrade,
-        "yourItems",
-        "your"
-    );
+    document
+        .querySelectorAll(".page")
+        .forEach(p=>p.classList.remove("active"));
 
+    const page =
+        document.getElementById(name+"Page");
 
-    renderTrade(
-        theirTrade,
-        "theirItems",
-        "their"
-    );
+    if(page)
+        page.classList.add("active");
 
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(btn=>btn.classList.remove("active"));
 
-    updateResult();
+    const buttons =
+        document.querySelectorAll(".nav-btn");
 
+    const index = {
+        home:0,
+        trades:1,
+        friends:2,
+        profile:3
+    };
+
+    if(index[name] !== undefined)
+        buttons[index[name]].classList.add("active");
 }
 
 
-/* =========================================
-   REFRESH
-========================================= */
+/* =========================================================
+   AUTH
+   ========================================================= */
 
-function refresh(){
+function toggleAuth(){
 
-    createMenus();
+    signupMode = !signupMode;
 
-    updateStatus();
+    document.getElementById("authTitle")
+        .textContent =
+        signupMode
+        ? "Create account"
+        : "Welcome back";
 
-    renderValues();
+    document.getElementById("authSubtitle")
+        .textContent =
+        signupMode
+        ? "Create your Carr Hill Trading account"
+        : "Sign in to Carr Hill Trading";
 
-    createTicker();
+    document.getElementById("usernameField")
+        .style.display =
+        signupMode ? "block" : "none";
 
-    render();
+    document.getElementById("authButton")
+        .textContent =
+        signupMode ? "Create account" : "Sign in";
 
+    document.getElementById("authToggle")
+        .textContent =
+        signupMode
+        ? "Already have an account? Sign in"
+        : "Need an account? Sign up";
 }
 
 
-refresh();
+async function submitAuth(){
 
+    const email =
+        document.getElementById("email").value.trim();
 
-/* update automatically */
+    const password =
+        document.getElementById("password").value;
 
-setInterval(
-    refresh,
-    30000
-);
+    if(!email || !password){
 
+        toast("Enter your email and password.");
 
-/* Enter key */
+        return;
+    }
 
-document.addEventListener(
-    "keydown",
-    event => {
+    try{
 
-        if(
-            event.key === "Enter" &&
-            document.activeElement.id ===
-            "yourQuantity"
-        ){
+        if(signupMode){
 
-            addItem("your");
+            const username =
+                document.getElementById("username")
+                .value.trim()
+                .toLowerCase();
 
+            if(!username){
+
+                toast("Choose a username.");
+
+                return;
+            }
+
+            const {data,error} =
+                await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options:{
+                        data:{
+                            username
+                        }
+                    }
+                });
+
+            if(error) throw error;
+
+            toast(
+                "Account created! Check your email if confirmation is required."
+            );
+
+        }else{
+
+            const {data,error} =
+                await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+            if(error) throw error;
+
+            toast("Logged in!");
+
+            loadUser(data.user);
         }
 
+    }catch(error){
 
-        if(
-            event.key === "Enter" &&
-            document.activeElement.id ===
-            "theirQuantity"
-        ){
+        console.error(error);
 
-            addItem("their");
+        toast(error.message);
+    }
+}
+
+
+/* =========================================================
+   USER
+   ========================================================= */
+
+async function loadUser(user){
+
+    if(!user) return;
+
+    const username =
+        user.user_metadata?.username ||
+        user.email?.split("@")[0] ||
+        "user";
+
+    document.getElementById("loggedUser")
+        .textContent =
+        "@"+username;
+
+    document.getElementById("profileUsername")
+        .textContent =
+        "@"+username;
+
+    document.getElementById("profileEmail")
+        .textContent =
+        user.email || "";
+
+    document.getElementById("authPage")
+        .classList.remove("active");
+
+    document.getElementById("bottomNav")
+        .style.display = "grid";
+
+    showPage("home");
+}
+
+
+async function signOut(){
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById("bottomNav")
+        .style.display = "none";
+
+    document
+        .querySelectorAll(".page")
+        .forEach(p=>p.classList.remove("active"));
+
+    document
+        .getElementById("authPage")
+        .classList.add("active");
+
+    toast("Signed out.");
+}
+
+
+/* =========================================================
+   FRIEND SEARCH
+   ========================================================= */
+
+async function searchUser(){
+
+    const username =
+        document.getElementById("friendSearch")
+        .value.trim()
+        .toLowerCase();
+
+    const results =
+        document.getElementById("friendResults");
+
+    if(!username){
+
+        results.innerHTML =
+            "🔎<br>Enter a username.";
+
+        return;
+    }
+
+    results.innerHTML =
+        "Searching...";
+
+    /*
+       Friend database connection will be added
+       after the friends table is created in Supabase.
+    */
+
+    results.innerHTML = `
+        🔎<br>
+        <strong>@${username}</strong><br>
+        <small style="color:#777">
+            Friend search is ready for the database.
+        </small>
+    `;
+}
+
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+let toastTimer;
+
+function toast(message){
+
+    const box =
+        document.getElementById("toast");
+
+    box.textContent = message;
+
+    box.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(()=>{
+            box.classList.remove("show");
+        },3000);
+}
+
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+populateSelects();
+renderOffers();
+renderValues();
+
+setInterval(()=>{
+    renderValues();
+    renderOffers();
+},30000);
+
+
+/* Check existing login */
+
+supabaseClient.auth
+.getSession()
+.then(({data})=>{
+
+    if(data.session){
+
+        loadUser(data.session.user);
+
+    }
+
+});
+
+
+/* Watch login state */
+
+supabaseClient.auth
+.onAuthStateChange(
+    (event,session)=>{
+
+        if(session){
+
+            loadUser(session.user);
 
         }
 
