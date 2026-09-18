@@ -1177,18 +1177,30 @@ async function loadUser() {
 
 async function loadProfile() {
 
-  const {
-    data,
-    error
-  } = await supabaseClient
-    .from("profile")
-    .select("*")
-    .eq("id", currentUser.id)
-    .maybeSingle();
+  if (!currentUser) return;
+
+  const usernameEl =
+    document.getElementById("profileUsername");
+
+  const idEl =
+    document.getElementById("profileId");
+
+  const welcomeEl =
+    document.getElementById("welcomeText");
+
+  if (idEl) {
+    idEl.textContent = currentUser.id;
+  }
+
+  const { data, error } =
+    await supabaseClient
+      .from("profile")
+      .select("username, avatar_url")
+      .eq("id", currentUser.id)
+      .maybeSingle();
 
   if (error) {
-    console.error(error);
-    return;
+    console.error("Profile loading error:", error);
   }
 
   const username =
@@ -1197,20 +1209,14 @@ async function loadProfile() {
     currentUser.email?.split("@")[0] ||
     "User";
 
-  document
-    .getElementById("welcomeText")
-    .textContent =
+  if (usernameEl) {
+    usernameEl.textContent = username;
+  }
+
+  if (welcomeEl) {
+    welcomeEl.textContent =
       `Welcome, ${username} 👋`;
-
-  document
-    .getElementById("profileUsername")
-    .textContent =
-      username;
-
-  document
-    .getElementById("profileId")
-    .textContent =
-      currentUser.id;
+  }
 }
 
 
