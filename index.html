@@ -6,614 +6,1864 @@
 <title>Carr Hill Trading</title>
 
 <style>
-* {
-    box-sizing: border-box;
+:root{
+    --bg:#06070a;
+    --card:rgba(17,19,25,.72);
+    --card2:rgba(24,27,35,.82);
+    --border:rgba(255,255,255,.09);
+    --text:#f7f8fb;
+    --muted:#8e96a8;
+    --red:#ff3048;
+    --red2:#9e071d;
+    --green:#45e39a;
+    --blue:#5da9ff;
+    --gold:#ffd166;
 }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0b0b0f;
-    color: white;
+*{
+    box-sizing:border-box;
 }
 
-header {
-    background: linear-gradient(135deg, #8b0000, #3d0000);
-    padding: 25px;
-    text-align: center;
-    border-bottom: 3px solid #ff3030;
+html{
+    scroll-behavior:smooth;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 32px;
+body{
+    margin:0;
+    min-height:100vh;
+    color:var(--text);
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 10% 5%,
+            rgba(255,48,72,.13),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 15%,
+            rgba(90,120,255,.10),
+            transparent 25%
+        ),
+        linear-gradient(
+            135deg,
+            #050608,
+            #0b0d12 50%,
+            #050608
+        );
+
+    overflow-x:hidden;
 }
 
-header p {
-    margin: 8px 0 0;
-    color: #ddd;
+/* MOVING GRID */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-5;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size:45px 45px;
+
+    animation:gridMove 20s linear infinite;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent 90%
+        );
 }
 
-.container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 20px;
+@keyframes gridMove{
+    from{
+        transform:translate(0,0);
+    }
+
+    to{
+        transform:translate(45px,45px);
+    }
 }
 
-/* SCHOOL STATUS */
+/* FLOATING GLOW */
 
-.status {
-    text-align: center;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    font-weight: bold;
-    background: #18181d;
-    border: 1px solid #333;
+.glow{
+    position:fixed;
+    width:280px;
+    height:280px;
+    border-radius:50%;
+    filter:blur(80px);
+    opacity:.18;
+    pointer-events:none;
+    z-index:-4;
 }
 
-.in-school {
-    color: #55ff88;
+.glow.red{
+    background:#ff1f3d;
+    left:-120px;
+    top:15%;
+    animation:floatRed 11s ease-in-out infinite;
 }
 
-.out-school {
-    color: #ff5555;
+.glow.blue{
+    background:#5d6cff;
+    right:-130px;
+    bottom:5%;
+    animation:floatBlue 14s ease-in-out infinite;
+}
+
+@keyframes floatRed{
+    0%,100%{
+        transform:translate(0,0);
+    }
+
+    50%{
+        transform:translate(130px,80px);
+    }
+}
+
+@keyframes floatBlue{
+    0%,100%{
+        transform:translate(0,0);
+    }
+
+    50%{
+        transform:translate(-100px,-80px);
+    }
+}
+
+.container{
+    width:min(1150px,calc(100% - 24px));
+    margin:auto;
+}
+
+/* HEADER */
+
+header{
+    padding:32px 0 20px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.logo{
+    width:55px;
+    height:55px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:17px;
+
+    font-size:27px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ff465c,
+            #8c0019
+        );
+
+    border:1px solid rgba(255,255,255,.15);
+
+    box-shadow:
+        0 15px 40px rgba(255,40,65,.25),
+        inset 0 1px 0 rgba(255,255,255,.2);
+
+    animation:logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat{
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-4px);
+    }
+}
+
+.brand h1{
+    margin:0;
+
+    font-size:
+        clamp(28px,5vw,43px);
+
+    letter-spacing:-1.8px;
+}
+
+.brand p{
+    margin:5px 0 0;
+
+    color:var(--muted);
+
+    font-size:13px;
+}
+
+/* HERO */
+
+.hero{
+    position:relative;
+    overflow:hidden;
+
+    padding:20px;
+
+    margin-bottom:16px;
+
+    border-radius:22px;
+
+    border:1px solid var(--border);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.015)
+        );
+
+    backdrop-filter:blur(20px);
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.4);
+}
+
+.hero::after{
+    content:"";
+
+    position:absolute;
+
+    width:250px;
+    height:250px;
+
+    right:-110px;
+    bottom:-160px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+        0 0 0 35px rgba(255,255,255,.02),
+        0 0 0 70px rgba(255,255,255,.012);
+
+    animation:spin 18s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.hero-row{
+    display:flex;
+
+    justify-content:space-between;
+    align-items:center;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:9px;
+
+    width:max-content;
+
+    padding:10px 14px;
+
+    border-radius:12px;
+
+    background:rgba(0,0,0,.25);
+
+    border:1px solid var(--border);
+
+    font-size:12px;
+
+    font-weight:800;
+}
+
+.dot{
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:var(--green);
+
+    animation:pulse 2s infinite;
+}
+
+.status.out .dot{
+    background:var(--red);
+}
+
+@keyframes pulse{
+    0%{
+        box-shadow:0 0 0 0 rgba(69,227,154,.5);
+    }
+
+    70%{
+        box-shadow:0 0 0 10px rgba(69,227,154,0);
+    }
+
+    100%{
+        box-shadow:0 0 0 0 rgba(69,227,154,0);
+    }
+}
+
+.clock{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.hero-sub{
+    margin-top:11px;
+
+    color:#777f91;
+
+    font-size:12px;
 }
 
 /* TRADE */
 
-.trade-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+.trade-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+
+    gap:16px;
 }
 
-@media (max-width: 700px) {
-    .trade-container {
-        grid-template-columns: 1fr;
+.panel{
+    position:relative;
+    overflow:hidden;
+
+    padding:18px;
+
+    border-radius:21px;
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    backdrop-filter:blur(20px);
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.38);
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease;
+}
+
+.panel:hover{
+    transform:translateY(-3px);
+
+    border-color:
+        rgba(255,255,255,.14);
+}
+
+.panel::before{
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+
+    background:
+        linear-gradient(
+            120deg,
+            rgba(255,255,255,.04),
+            transparent 35%
+        );
+}
+
+.panel-head{
+    display:flex;
+
+    justify-content:space-between;
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:13px;
+}
+
+.panel-title{
+    display:flex;
+
+    align-items:center;
+
+    gap:11px;
+}
+
+.panel-icon{
+    width:43px;
+    height:43px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:13px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    font-size:20px;
+}
+
+.panel h2{
+    margin:0;
+
+    font-size:18px;
+}
+
+.panel-sub{
+    margin-top:3px;
+
+    color:var(--muted);
+
+    font-size:11px;
+}
+
+.clear{
+    border:1px solid var(--border);
+
+    background:rgba(255,255,255,.04);
+
+    color:#aeb5c4;
+
+    border-radius:9px;
+
+    padding:8px 10px;
+
+    font-size:10px;
+
+    font-weight:900;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.clear:hover{
+    background:
+        rgba(255,48,72,.12);
+
+    color:white;
+
+    border-color:
+        rgba(255,48,72,.3);
+}
+
+/* ITEMS */
+
+.trade-list{
+    min-height:165px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+}
+
+.empty{
+    min-height:158px;
+
+    display:grid;
+
+    place-items:center;
+
+    text-align:center;
+
+    color:#697181;
+
+    border:
+        1px dashed
+        rgba(255,255,255,.08);
+
+    border-radius:14px;
+
+    background:
+        rgba(0,0,0,.12);
+}
+
+.empty-icon{
+    font-size:28px;
+}
+
+.empty-text{
+    margin-top:6px;
+
+    font-size:12px;
+}
+
+.trade-item{
+    display:grid;
+
+    grid-template-columns:
+        auto 1fr auto auto;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:10px;
+
+    border-radius:14px;
+
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid
+        rgba(255,255,255,.065);
+
+    animation:itemIn .3s ease both;
+
+    transition:.2s;
+}
+
+.trade-item:hover{
+    background:
+        rgba(255,255,255,.07);
+
+    transform:translateX(2px);
+}
+
+@keyframes itemIn{
+    from{
+        opacity:0;
+        transform:
+            translateY(8px)
+            scale(.98);
+    }
+
+    to{
+        opacity:1;
+        transform:none;
     }
 }
 
-.trade-box {
-    background: #151519;
-    border: 1px solid #333;
-    border-radius: 15px;
-    padding: 20px;
+.item-icon{
+    width:40px;
+    height:40px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:11px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.10),
+            rgba(255,255,255,.025)
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    font-size:19px;
 }
 
-.trade-box h2 {
-    margin-top: 0;
+.item-name{
+    font-size:13px;
+
+    font-weight:850;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
 }
 
-.items {
-    min-height: 150px;
+.item-meta{
+    display:flex;
+
+    gap:7px;
+
+    align-items:center;
+
+    margin-top:4px;
+
+    color:var(--muted);
+
+    font-size:10px;
 }
 
-.item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #202027;
-    border: 1px solid #36363f;
-    padding: 12px;
-    border-radius: 10px;
-    margin-bottom: 8px;
+.rarity{
+    padding:3px 6px;
+
+    border-radius:999px;
+
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    font-size:8px;
+
+    font-weight:900;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
 }
 
-.item-name {
-    font-weight: bold;
+.line-value{
+    font-size:14px;
+
+    font-weight:950;
+
+    white-space:nowrap;
 }
 
-.item-price {
-    color: #aaa;
-    font-size: 13px;
-    margin-top: 3px;
+.remove{
+    width:30px;
+    height:30px;
+
+    border-radius:9px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    background:
+        rgba(255,48,72,.09);
+
+    color:#ff7180;
+
+    cursor:pointer;
+
+    transition:.2s;
 }
 
-.remove {
-    background: #8b0000;
-    color: white;
-    border: 0;
-    border-radius: 7px;
-    padding: 7px 10px;
-    cursor: pointer;
+.remove:hover{
+    background:
+        rgba(255,48,72,.2);
+
+    color:white;
+
+    transform:
+        scale(1.08)
+        rotate(5deg);
 }
 
-.remove:hover {
-    background: #c00000;
-}
+/* CONTROLS */
 
-/* ADD ITEM */
+.controls{
+    display:grid;
 
-.add-area {
-    display: grid;
-    grid-template-columns: 1fr 80px 70px;
-    gap: 7px;
-    margin-top: 15px;
+    grid-template-columns:
+        1fr 70px 60px;
+
+    gap:7px;
+
+    margin-top:13px;
 }
 
 select,
-input {
-    background: #0b0b0f;
-    color: white;
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 10px;
-    min-width: 0;
+input{
+    width:100%;
+
+    padding:11px;
+
+    border-radius:10px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:#080a0f;
+
+    color:white;
+
+    outline:none;
+
+    font:inherit;
+
+    transition:.2s;
 }
 
-button {
-    cursor: pointer;
+select:focus,
+input:focus{
+    border-color:
+        rgba(255,48,72,.55);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(255,48,72,.08);
 }
 
-.add-button {
-    background: #b00000;
-    color: white;
-    border: 0;
-    border-radius: 8px;
-    font-weight: bold;
+.add{
+    border:0;
+
+    border-radius:10px;
+
+    color:white;
+
+    font-weight:950;
+
+    cursor:pointer;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff3e53,
+            #980017
+        );
+
+    box-shadow:
+        0 10px 25px
+        rgba(255,48,72,.18);
+
+    transition:.2s;
 }
 
-.add-button:hover {
-    background: #e00000;
+.add:hover{
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 15px 32px
+        rgba(255,48,72,.28);
 }
 
-/* TOTALS */
+.total-row{
+    display:flex;
 
-.total {
-    margin-top: 18px;
-    font-size: 28px;
-    font-weight: bold;
+    align-items:end;
+
+    justify-content:space-between;
+
+    margin-top:15px;
 }
 
-.total-label {
-    font-size: 13px;
-    color: #999;
+.total-label{
+    color:var(--muted);
+
+    font-size:10px;
+
+    font-weight:900;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+}
+
+.total{
+    font-size:27px;
+
+    font-weight:950;
+
+    letter-spacing:-.8px;
 }
 
 /* RESULT */
 
-.result {
-    margin-top: 20px;
-    text-align: center;
-    background: #151519;
-    border: 1px solid #333;
-    border-radius: 15px;
-    padding: 20px;
+.result{
+    position:relative;
+
+    overflow:hidden;
+
+    margin-top:16px;
+
+    padding:19px;
+
+    border-radius:21px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.015)
+        );
+
+    border:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.35);
 }
 
-.result-title {
-    font-size: 24px;
-    font-weight: bold;
+.result-title{
+    font-size:21px;
+
+    font-weight:950;
 }
 
-.difference {
-    margin-top: 8px;
-    color: #aaa;
+.result-note{
+    margin-top:4px;
+
+    color:var(--muted);
+
+    font-size:11px;
+}
+
+.result-top{
+    display:flex;
+
+    align-items:start;
+
+    justify-content:space-between;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+}
+
+.diff{
+    text-align:right;
+}
+
+.diff small{
+    display:block;
+
+    color:var(--muted);
+
+    font-size:9px;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+}
+
+.diff strong{
+    font-size:18px;
+}
+
+.meter{
+    height:9px;
+
+    margin-top:16px;
+
+    border-radius:99px;
+
+    overflow:hidden;
+
+    background:#090b10;
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+}
+
+.meter-fill{
+    height:100%;
+
+    width:50%;
+
+    border-radius:inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            #5da9ff,
+            #45e39a 50%,
+            #ffd166
+        );
+
+    transition:
+        width .5s
+        cubic-bezier(.2,.8,.2,1);
+}
+
+.meter-labels{
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-top:6px;
+
+    color:#656d7d;
+
+    font-size:8px;
+
+    text-transform:uppercase;
 }
 
 /* VALUES */
 
-.values {
-    margin-top: 25px;
-    background: #151519;
-    border: 1px solid #333;
-    border-radius: 15px;
-    padding: 20px;
+.values{
+    margin-top:16px;
 }
 
-.values h2 {
-    margin-top: 0;
+.values-head{
+    display:flex;
+
+    align-items:end;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    margin-bottom:10px;
 }
 
-.value-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 5px;
-    border-bottom: 1px solid #292930;
+.values h2{
+    margin:0;
+
+    font-size:18px;
 }
 
-.value-row:last-child {
-    border-bottom: 0;
+.values p{
+    margin:4px 0 0;
+
+    color:var(--muted);
+
+    font-size:11px;
 }
 
-.school-price {
-    color: #55ff88;
+.search{
+    max-width:260px;
 }
 
-.out-price {
-    color: #ff7777;
+.value-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+
+    gap:9px;
 }
 
-.unavailable {
-    color: #666;
-    text-decoration: line-through;
+.value-card{
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:11px;
+
+    border-radius:15px;
+
+    background:var(--card);
+
+    border:
+        1px solid
+        var(--border);
+
+    transition:.2s;
+
+    animation:fadeUp .3s both;
+}
+
+.value-card:hover{
+    transform:translateY(-2px);
+
+    background:var(--card2);
+
+    border-color:
+        rgba(255,255,255,.14);
+}
+
+.value-icon{
+    width:39px;
+    height:39px;
+
+    display:grid;
+    place-items:center;
+
+    flex-shrink:0;
+
+    border-radius:10px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    font-size:18px;
+}
+
+.value-main{
+    min-width:0;
+
+    flex:1;
+}
+
+.value-name{
+    font-size:12px;
+
+    font-weight:850;
+}
+
+.value-sub{
+    margin-top:3px;
+
+    color:var(--muted);
+
+    font-size:9px;
+}
+
+.value-price{
+    text-align:right;
+
+    white-space:nowrap;
+}
+
+.current{
+    font-size:14px;
+
+    font-weight:950;
+}
+
+.old{
+    margin-top:2px;
+
+    color:#687082;
+
+    font-size:8px;
+}
+
+.unavailable{
+    opacity:.45;
+}
+
+/* TICKER */
+
+.ticker{
+    margin:
+        22px 0 26px;
+
+    overflow:hidden;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.06);
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.06);
+}
+
+.ticker-track{
+    width:max-content;
+
+    display:flex;
+
+    gap:38px;
+
+    padding:10px 0;
+
+    animation:
+        ticker 24s linear infinite;
+}
+
+.ticker-item{
+    color:#8991a2;
+
+    font-size:10px;
+
+    font-weight:800;
+}
+
+.ticker-item b{
+    color:white;
+}
+
+@keyframes ticker{
+    from{
+        transform:translateX(0);
+    }
+
+    to{
+        transform:translateX(-50%);
+    }
+}
+
+.footer{
+    padding-bottom:30px;
+
+    text-align:center;
+
+    color:#555d6d;
+
+    font-size:9px;
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+    .trade-grid{
+        grid-template-columns:1fr;
+    }
+
+    .value-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:560px){
+
+    .container{
+        width:
+            calc(100% - 16px);
+    }
+
+    header{
+        padding-top:20px;
+    }
+
+    .hero{
+        padding:15px;
+
+        border-radius:18px;
+    }
+
+    .panel,
+    .result{
+        border-radius:18px;
+
+        padding:14px;
+    }
+
+    .controls{
+        grid-template-columns:
+            1fr 65px 58px;
+    }
+
+    .trade-item{
+        grid-template-columns:
+            auto 1fr auto;
+    }
+
+    .line-value{
+        grid-column:2;
+    }
+
+    .remove{
+        grid-column:3;
+
+        grid-row:
+            1 / span 2;
+    }
+
+    .diff{
+        text-align:left;
+    }
+
+    .total{
+        font-size:24px;
+    }
+
+    .brand h1{
+        font-size:27px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-    <h1>🏫 Carr Hill Trading</h1>
-    <p>School Item Trade Calculator</p>
-</header>
+<div class="glow red"></div>
+<div class="glow blue"></div>
 
 <div class="container">
 
-    <div id="status" class="status"></div>
+<header>
 
-    <div class="trade-container">
+    <div class="brand">
 
-        <!-- YOUR SIDE -->
-
-        <div class="trade-box">
-
-            <h2>👤 Your Offer</h2>
-
-            <div id="yourItems" class="items">
-                <p style="color:#777;">No items added</p>
-            </div>
-
-            <div class="add-area">
-
-                <select id="yourSelect"></select>
-
-                <input
-                    id="yourQuantity"
-                    type="number"
-                    min="1"
-                    max="99"
-                    value="1"
-                >
-
-                <button
-                    class="add-button"
-                    onclick="addYourItem()">
-                    ADD
-                </button>
-
-            </div>
-
-            <div class="total-label">YOUR VALUE</div>
-            <div id="yourTotal" class="total">£0.00</div>
-
+        <div class="logo">
+            🏫
         </div>
 
+        <div>
 
-        <!-- THEIR SIDE -->
+            <h1>
+                Carr Hill Trading
+            </h1>
 
-        <div class="trade-box">
-
-            <h2>🤝 Their Offer</h2>
-
-            <div id="theirItems" class="items">
-                <p style="color:#777;">No items added</p>
-            </div>
-
-            <div class="add-area">
-
-                <select id="theirSelect"></select>
-
-                <input
-                    id="theirQuantity"
-                    type="number"
-                    min="1"
-                    max="99"
-                    value="1"
-                >
-
-                <button
-                    class="add-button"
-                    onclick="addTheirItem()">
-                    ADD
-                </button>
-
-            </div>
-
-            <div class="total-label">THEIR VALUE</div>
-            <div id="theirTotal" class="total">£0.00</div>
+            <p>
+                School item trading calculator
+            </p>
 
         </div>
 
     </div>
 
+</header>
 
-    <!-- RESULT -->
 
-    <div class="result">
+<!-- MARKET STATUS -->
 
-        <div id="resultTitle" class="result-title">
-            Add items to calculate the trade
+<section class="hero">
+
+    <div class="hero-row">
+
+        <div
+            class="status"
+            id="status"
+        >
+
+            <span class="dot"></span>
+
+            <span id="statusText">
+                Checking market...
+            </span>
+
         </div>
 
-        <div id="difference" class="difference"></div>
+        <div
+            class="clock"
+            id="clock"
+        >
+            --:--:--
+        </div>
+
+    </div>
+
+    <div
+        class="hero-sub"
+        id="heroSub"
+    >
+        Checking current market prices...
+    </div>
+
+</section>
+
+
+<!-- TRADE PANELS -->
+
+<section class="trade-grid">
+
+
+<!-- YOUR OFFER -->
+
+<div class="panel">
+
+    <div class="panel-head">
+
+        <div class="panel-title">
+
+            <div class="panel-icon">
+                👤
+            </div>
+
+            <div>
+
+                <h2>
+                    Your Offer
+                </h2>
+
+                <div class="panel-sub">
+                    What you're giving
+                </div>
+
+            </div>
+
+        </div>
+
+        <button
+            class="clear"
+            onclick="clearTrade('your')"
+        >
+            CLEAR
+        </button>
 
     </div>
 
 
-    <!-- ITEM VALUES -->
+    <div
+        id="yourItems"
+        class="trade-list"
+    ></div>
 
-    <div class="values">
 
-        <h2>📋 Item Values</h2>
+    <div class="controls">
 
-        <div id="valueList"></div>
+        <select
+            id="yourSelect"
+        ></select>
+
+        <input
+            id="yourQuantity"
+            type="number"
+            min="1"
+            max="99"
+            value="1"
+        >
+
+        <button
+            class="add"
+            onclick="addItem('your')"
+        >
+            ADD
+        </button>
+
+    </div>
+
+
+    <div class="total-row">
+
+        <div class="total-label">
+            Your total
+        </div>
+
+        <div
+            class="total"
+            id="yourTotal"
+        >
+            £0.00
+        </div>
 
     </div>
 
 </div>
 
 
+<!-- THEIR OFFER -->
+
+<div class="panel">
+
+    <div class="panel-head">
+
+        <div class="panel-title">
+
+            <div class="panel-icon">
+                🤝
+            </div>
+
+            <div>
+
+                <h2>
+                    Their Offer
+                </h2>
+
+                <div class="panel-sub">
+                    What you're receiving
+                </div>
+
+            </div>
+
+        </div>
+
+        <button
+            class="clear"
+            onclick="clearTrade('their')"
+        >
+            CLEAR
+        </button>
+
+    </div>
+
+
+    <div
+        id="theirItems"
+        class="trade-list"
+    ></div>
+
+
+    <div class="controls">
+
+        <select
+            id="theirSelect"
+        ></select>
+
+        <input
+            id="theirQuantity"
+            type="number"
+            min="1"
+            max="99"
+            value="1"
+        >
+
+        <button
+            class="add"
+            onclick="addItem('their')"
+        >
+            ADD
+        </button>
+
+    </div>
+
+
+    <div class="total-row">
+
+        <div class="total-label">
+            Their total
+        </div>
+
+        <div
+            class="total"
+            id="theirTotal"
+        >
+            £0.00
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- RESULT -->
+
+<section class="result">
+
+    <div class="result-top">
+
+        <div>
+
+            <div
+                class="result-title"
+                id="resultTitle"
+            >
+                Build a trade to compare values
+            </div>
+
+            <div
+                class="result-note"
+                id="resultNote"
+            >
+                Add items on both sides to compare them.
+            </div>
+
+        </div>
+
+
+        <div class="diff">
+
+            <small>
+                Difference
+            </small>
+
+            <strong
+                id="difference"
+            >
+                £0.00
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="meter">
+
+        <div
+            class="meter-fill"
+            id="meterFill"
+        ></div>
+
+    </div>
+
+
+    <div class="meter-labels">
+
+        <span>
+            You give more
+        </span>
+
+        <span>
+            Equal
+        </span>
+
+        <span>
+            You receive more
+        </span>
+
+    </div>
+
+</section>
+
+
+<!-- VALUES -->
+
+<section class="values">
+
+    <div class="values-head">
+
+        <div>
+
+            <h2>
+                📋 Item Values
+            </h2>
+
+            <p>
+                Current values update automatically
+            </p>
+
+        </div>
+
+
+        <div class="search">
+
+            <input
+                id="search"
+                type="search"
+                placeholder="🔎 Search items..."
+                oninput="renderValues()"
+            >
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="valueList"
+        class="value-grid"
+    ></div>
+
+</section>
+
+
+<!-- MOVING TICKER -->
+
+<div class="ticker">
+
+    <div
+        class="ticker-track"
+        id="tickerTrack"
+    ></div>
+
+</div>
+
+
+<div class="footer">
+
+    Carr Hill Trading · School item values · Fruit Pots unavailable
+
+</div>
+
+</div>
+
+
 <script>
 
-/* ==========================================
-   CARR HILL ITEMS
-
-   [name, school price, outside price]
-   ========================================== */
+/* =========================================
+   ITEMS
+========================================= */
 
 const items = [
 
     {
-        name: "Radnor Fizz",
-        school: 1.20,
-        outside: 1.00
+        name:"Radnor Fizz",
+        icon:"🥤",
+        rarity:"Common",
+        school:1.20,
+        outside:1.00
     },
 
     {
-        name: "Sausage Rolls",
-        school: 2.90,
-        outside: 1.50
+        name:"Sausage Rolls",
+        icon:"🌭",
+        rarity:"Legendary",
+        school:2.90,
+        outside:1.50
     },
 
     {
-        name: "Mini Doughnuts",
-        school: 1.20,
-        outside: 2.00
+        name:"Mini Doughnuts",
+        icon:"🍩",
+        rarity:"Rare",
+        school:1.20,
+        outside:2.00
     },
 
     {
-        name: "Radnor Splash",
-        school: 2.00,
-        outside: 1.50
+        name:"Radnor Splash",
+        icon:"💧",
+        rarity:"Rare",
+        school:2.00,
+        outside:1.50
     },
 
     {
-        name: "Radnor Fruits",
-        school: 1.00,
-        outside: 0.50
+        name:"Radnor Fruits",
+        icon:"🍓",
+        rarity:"Uncommon",
+        school:1.00,
+        outside:0.50
     },
 
     {
-        name: "Milkshakes",
-        school: 1.50,
-        outside: 2.00
+        name:"Milkshakes",
+        icon:"🥛",
+        rarity:"Rare",
+        school:1.50,
+        outside:2.00
     },
 
     {
-        name: "50p 2 Litre Coke Bottle",
-        school: 1.00,
-        outside: 0.70
+        name:"50p 2 Litre Coke Bottle",
+        icon:"🥤",
+        rarity:"Epic",
+        school:1.00,
+        outside:0.70
     },
 
     {
-        name: "Popcorn",
-        school: 1.10,
-        outside: 1.00
+        name:"Popcorn",
+        icon:"🍿",
+        rarity:"Uncommon",
+        school:1.10,
+        outside:1.00
+    },
+
+    {
+        name:"Fruit Pots",
+        icon:"🍉",
+        rarity:"Unavailable",
+        school:null,
+        outside:null,
+        unavailable:true
     }
 
 ];
 
 
-/* ==========================================
-   TRADE ARRAYS
-   ========================================== */
-
 let yourTrade = [];
+
 let theirTrade = [];
 
 
-/* ==========================================
-   CHECK SCHOOL TIME
-   ========================================== */
+/* =========================================
+   SCHOOL TIME
+========================================= */
 
-function isSchoolTime() {
+function isSchoolTime(){
 
-    const now = new Date();
+    const now =
+        new Date();
 
-    const day = now.getDay();
+    const day =
+        now.getDay();
 
-    const hour = now.getHours();
-
-    const minute = now.getMinutes();
-
-    const currentMinutes =
-        hour * 60 + minute;
+    const minutes =
+        now.getHours() * 60 +
+        now.getMinutes();
 
 
-    /*
-       Monday = 1
-       Friday = 5
+    return (
+        day >= 1 &&
+        day <= 5 &&
+        minutes >= 510 &&
+        minutes <= 930
+    );
 
-       School market:
-       08:30 → 15:30
-    */
+}
 
-    if (day >= 1 && day <= 5) {
 
-        if (
-            currentMinutes >= 510 &&
-            currentMinutes <= 930
-        ) {
+/* =========================================
+   PRICE
+========================================= */
 
-            return true;
+function getPrice(item){
 
-        }
-
+    if(item.unavailable){
+        return 0;
     }
 
-    return false;
+    return isSchoolTime()
+        ? item.school
+        : item.outside;
 
 }
 
 
-/* ==========================================
-   GET CURRENT PRICE
-   ========================================== */
+/* =========================================
+   MONEY
+========================================= */
 
-function getPrice(item) {
+function money(value){
 
-    if (isSchoolTime()) {
-
-        return item.school;
-
-    }
-
-    return item.outside;
+    return "£" +
+        Number(value).toFixed(2);
 
 }
 
 
-/* ==========================================
-   FORMAT MONEY
-   ========================================== */
+/* =========================================
+   SELECT MENUS
+========================================= */
 
-function money(amount) {
+function createMenus(){
 
-    return "£" + amount.toFixed(2);
+    [
+        "yourSelect",
+        "theirSelect"
+    ].forEach(id=>{
 
-}
+        const select =
+            document.getElementById(id);
 
-
-/* ==========================================
-   CREATE SELECT MENUS
-   ========================================== */
-
-function createMenus() {
-
-    const yourSelect =
-        document.getElementById("yourSelect");
-
-    const theirSelect =
-        document.getElementById("theirSelect");
+        select.innerHTML = "";
 
 
-    items.forEach((item, index) => {
+        items
+            .filter(item=>!item.unavailable)
+            .forEach((item,index)=>{
 
-        const option1 =
-            document.createElement("option");
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
-        option1.value = index;
+                option.value =
+                    index;
 
-        option1.textContent =
-            item.name +
-            " — " +
-            money(getPrice(item));
+                option.textContent =
+                    item.icon +
+                    " " +
+                    item.name +
+                    " — " +
+                    money(
+                        getPrice(item)
+                    );
 
-        yourSelect.appendChild(option1);
+                select.appendChild(
+                    option
+                );
 
-
-        const option2 =
-            document.createElement("option");
-
-        option2.value = index;
-
-        option2.textContent =
-            item.name +
-            " — " +
-            money(getPrice(item));
-
-        theirSelect.appendChild(option2);
+            });
 
     });
 
 }
 
 
-/* ==========================================
-   ADD TO YOUR TRADE
-   ========================================== */
+/* =========================================
+   ADD ITEM
+========================================= */
 
-function addYourItem() {
+function addItem(side){
 
     const select =
-        document.getElementById("yourSelect");
+        document.getElementById(
+            side + "Select"
+        );
 
-    const quantityInput =
-        document.getElementById("yourQuantity");
+    const input =
+        document.getElementById(
+            side + "Quantity"
+        );
 
-
-    const index =
-        Number(select.value);
 
     let quantity =
-        Number(quantityInput.value);
+        parseInt(
+            input.value,
+            10
+        );
 
 
-    if (!Number.isFinite(quantity)) {
+    if(
+        !Number.isFinite(quantity)
+    ){
+
         quantity = 1;
+
     }
 
 
     quantity =
         Math.max(
             1,
-            Math.min(99, Math.floor(quantity))
+            Math.min(
+                99,
+                quantity
+            )
         );
 
 
-    yourTrade.push({
+    const entry = {
 
-        index: index,
-        quantity: quantity
+        index:
+            Number(select.value),
 
-    });
+        quantity:
+            quantity
 
-
-    render();
-
-}
+    };
 
 
-/* ==========================================
-   ADD TO THEIR TRADE
-   ========================================== */
+    if(side === "your"){
 
-function addTheirItem() {
+        yourTrade.push(entry);
 
-    const select =
-        document.getElementById("theirSelect");
+    }else{
 
-    const quantityInput =
-        document.getElementById("theirQuantity");
+        theirTrade.push(entry);
 
-
-    const index =
-        Number(select.value);
-
-    let quantity =
-        Number(quantityInput.value);
-
-
-    if (!Number.isFinite(quantity)) {
-        quantity = 1;
     }
 
 
-    quantity =
-        Math.max(
-            1,
-            Math.min(99, Math.floor(quantity))
+    input.value = 1;
+
+
+    render();
+
+}
+
+
+/* =========================================
+   REMOVE
+========================================= */
+
+function removeItem(
+    side,
+    index
+){
+
+    if(side === "your"){
+
+        yourTrade.splice(
+            index,
+            1
         );
 
+    }else{
 
-    theirTrade.push({
+        theirTrade.splice(
+            index,
+            1
+        );
 
-        index: index,
-        quantity: quantity
-
-    });
+    }
 
 
     render();
@@ -621,352 +1871,629 @@ function addTheirItem() {
 }
 
 
-/* ==========================================
-   REMOVE ITEM
-   ========================================== */
+/* =========================================
+   CLEAR
+========================================= */
 
-function removeYourItem(index) {
+function clearTrade(side){
 
-    yourTrade.splice(index, 1);
+    if(side === "your"){
+
+        yourTrade = [];
+
+    }else{
+
+        theirTrade = [];
+
+    }
+
 
     render();
 
 }
 
 
-function removeTheirItem(index) {
+/* =========================================
+   TOTAL
+========================================= */
 
-    theirTrade.splice(index, 1);
+function calculateTotal(
+    trade
+){
 
-    render();
+    return trade.reduce(
+        (total,entry)=>{
 
-}
+            const item =
+                items[
+                    entry.index
+                ];
 
+            return total +
+                getPrice(item) *
+                entry.quantity;
 
-/* ==========================================
-   CALCULATE TOTAL
-   ========================================== */
-
-function calculateTotal(trade) {
-
-    let total = 0;
-
-
-    trade.forEach(entry => {
-
-        const item =
-            items[entry.index];
-
-        total +=
-            getPrice(item) *
-            entry.quantity;
-
-    });
-
-
-    return total;
+        },
+        0
+    );
 
 }
 
 
-/* ==========================================
+/* =========================================
    RENDER TRADE
-   ========================================== */
+========================================= */
 
 function renderTrade(
     trade,
     elementID,
-    removeFunction
-) {
+    side
+){
 
     const container =
-        document.getElementById(elementID);
+        document.getElementById(
+            elementID
+        );
 
 
-    container.innerHTML = "";
+    if(!trade.length){
 
+        container.innerHTML = `
 
-    if (trade.length === 0) {
+            <div class="empty">
 
-        container.innerHTML =
-            '<p style="color:#777;">No items added</p>';
+                <div>
+
+                    <div class="empty-icon">
+                        🛒
+                    </div>
+
+                    <div class="empty-text">
+                        Nothing added yet
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
 
         return;
 
     }
 
 
-    trade.forEach((entry, index) => {
+    container.innerHTML =
+        trade.map(
+            (entry,index)=>{
 
-        const item =
-            items[entry.index];
+                const item =
+                    items[
+                        entry.index
+                    ];
 
-        const currentPrice =
-            getPrice(item);
-
-
-        const row =
-            document.createElement("div");
-
-        row.className = "item";
-
-
-        row.innerHTML = `
-
-            <div>
-
-                <div class="item-name">
-                    ${item.name}
-                </div>
-
-                <div class="item-price">
-
-                    ${money(currentPrice)}
-                    ×
-                    ${entry.quantity}
-
-                </div>
-
-            </div>
-
-            <button
-                class="remove"
-                onclick="${removeFunction}(${index})">
-
-                ×
-
-            </button>
-
-        `;
+                const value =
+                    getPrice(item) *
+                    entry.quantity;
 
 
-        container.appendChild(row);
+                return `
 
-    });
+                    <div
+                        class="trade-item"
+                    >
+
+                        <div class="item-icon">
+                            ${item.icon}
+                        </div>
+
+
+                        <div>
+
+                            <div class="item-name">
+                                ${item.name}
+                            </div>
+
+                            <div class="item-meta">
+
+                                <span class="rarity">
+                                    ${item.rarity}
+                                </span>
+
+                                × ${entry.quantity}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="line-value">
+                            ${money(value)}
+                        </div>
+
+
+                        <button
+                            class="remove"
+                            onclick="removeItem(
+                                '${side}',
+                                ${index}
+                            )"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+                `;
+
+            }
+        ).join("");
 
 }
 
 
-/* ==========================================
-   UPDATE STATUS
-   ========================================== */
+/* =========================================
+   RESULT
+========================================= */
 
-function updateStatus() {
+function updateResult(){
 
-    const status =
-        document.getElementById("status");
+    const yourTotal =
+        calculateTotal(
+            yourTrade
+        );
+
+    const theirTotal =
+        calculateTotal(
+            theirTrade
+        );
 
 
-    if (isSchoolTime()) {
+    const difference =
+        Math.abs(
+            yourTotal -
+            theirTotal
+        );
 
-        status.className =
-            "status in-school";
 
-        status.innerHTML =
-            "📈 IN SCHOOL — SCHOOL PRICES ACTIVE";
+    document.getElementById(
+        "yourTotal"
+    ).textContent =
+        money(yourTotal);
 
-    } else {
 
-        status.className =
-            "status out-school";
+    document.getElementById(
+        "theirTotal"
+    ).textContent =
+        money(theirTotal);
 
-        status.innerHTML =
-            "📉 OUT OF SCHOOL — OUTSIDE PRICES ACTIVE";
+
+    document.getElementById(
+        "difference"
+    ).textContent =
+        money(difference);
+
+
+    const title =
+        document.getElementById(
+            "resultTitle"
+        );
+
+    const note =
+        document.getElementById(
+            "resultNote"
+        );
+
+    const meter =
+        document.getElementById(
+            "meterFill"
+        );
+
+
+    if(
+        !yourTrade.length &&
+        !theirTrade.length
+    ){
+
+        title.textContent =
+            "Build a trade to compare values";
+
+        note.textContent =
+            "Add items on both sides to compare them.";
+
+        meter.style.width =
+            "50%";
+
+        return;
 
     }
 
+
+    if(difference < 0.25){
+
+        title.textContent =
+            "⚖️ VERY CLOSE TRADE";
+
+        note.textContent =
+            "The two offers are within 25p.";
+
+    }
+
+    else if(
+        yourTotal >
+        theirTotal
+    ){
+
+        title.textContent =
+            "📈 YOUR OFFER IS WORTH MORE";
+
+        note.textContent =
+            "Your side has the higher listed value.";
+
+    }
+
+    else{
+
+        title.textContent =
+            "📈 THEIR OFFER IS WORTH MORE";
+
+        note.textContent =
+            "Their side has the higher listed value.";
+
+    }
+
+
+    const ratio =
+        (yourTotal + theirTotal) === 0
+            ? .5
+            : theirTotal /
+              (yourTotal + theirTotal);
+
+
+    meter.style.width =
+        Math.max(
+            8,
+            Math.min(
+                92,
+                ratio * 100
+            )
+        ) + "%";
+
 }
 
 
-/* ==========================================
-   UPDATE ITEM VALUE LIST
-   ========================================== */
+/* =========================================
+   STATUS
+========================================= */
 
-function updateValues() {
+function updateStatus(){
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+    const text =
+        document.getElementById(
+            "statusText"
+        );
+
+    const sub =
+        document.getElementById(
+            "heroSub"
+        );
+
+
+    if(isSchoolTime()){
+
+        status.classList.remove(
+            "out"
+        );
+
+        text.textContent =
+            "IN SCHOOL — SCHOOL PRICES ACTIVE";
+
+        sub.textContent =
+            "School-day values are active right now.";
+
+    }
+
+    else{
+
+        status.classList.add(
+            "out"
+        );
+
+        text.textContent =
+            "OUT OF SCHOOL — OUTSIDE PRICES ACTIVE";
+
+        sub.textContent =
+            "Outside-school values are active right now.";
+
+    }
+
+
+    document.getElementById(
+        "clock"
+    ).textContent =
+        new Date().toLocaleTimeString(
+            [],
+            {
+                hour:"2-digit",
+                minute:"2-digit",
+                second:"2-digit"
+            }
+        );
+
+}
+
+
+/* =========================================
+   VALUE LIST
+========================================= */
+
+function renderValues(){
+
+    const search =
+        document.getElementById(
+            "search"
+        ).value
+        .toLowerCase()
+        .trim();
+
 
     const list =
-        document.getElementById("valueList");
+        document.getElementById(
+            "valueList"
+        );
 
 
-    list.innerHTML = "";
+    const filtered =
+        items.filter(
+            item =>
+                item.name
+                .toLowerCase()
+                .includes(search)
+        );
 
 
-    items.forEach(item => {
+    list.innerHTML =
+        filtered.map(
+            (item,index)=>{
 
-        const row =
-            document.createElement("div");
+                if(item.unavailable){
 
-        row.className =
-            "value-row";
+                    return `
 
+                        <div
+                            class="value-card unavailable"
+                        >
 
-        row.innerHTML = `
+                            <div class="value-icon">
+                                ${item.icon}
+                            </div>
 
-            <span>
-                ${item.name}
-            </span>
+                            <div class="value-main">
 
-            <span>
+                                <div class="value-name">
+                                    ${item.name}
+                                </div>
 
-                <span class="school-price">
-                    ${money(item.school)}
-                </span>
+                                <div class="value-sub">
+                                    Not tradeable
+                                </div>
 
-                /
-                <span class="out-price">
-                    ${money(item.outside)}
-                </span>
+                            </div>
 
-            </span>
+                            <div class="value-price">
 
-        `;
+                                <div class="current">
+                                    UNAVAILABLE
+                                </div>
 
+                            </div>
 
-        list.appendChild(row);
+                        </div>
 
-    });
+                    `;
 
-
-    const fruitPots =
-        document.createElement("div");
-
-    fruitPots.className =
-        "value-row";
-
-
-    fruitPots.innerHTML = `
-
-        <span class="unavailable">
-            Fruit Pots
-        </span>
-
-        <span class="unavailable">
-            UNAVAILABLE
-        </span>
-
-    `;
+                }
 
 
-    list.appendChild(fruitPots);
+                const current =
+                    getPrice(item);
+
+
+                return `
+
+                    <div
+                        class="value-card"
+                        style="
+                            animation-delay:
+                            ${index * 35}ms
+                        "
+                    >
+
+                        <div class="value-icon">
+                            ${item.icon}
+                        </div>
+
+
+                        <div class="value-main">
+
+                            <div class="value-name">
+                                ${item.name}
+                            </div>
+
+                            <div class="value-sub">
+                                ${item.rarity}
+                            </div>
+
+                        </div>
+
+
+                        <div class="value-price">
+
+                            <div class="current">
+                                ${money(current)}
+                            </div>
+
+                            <div class="old">
+                                School:
+                                ${money(item.school)}
+                                ·
+                                Outside:
+                                ${money(item.outside)}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        ).join("");
 
 }
 
 
-/* ==========================================
-   MAIN RENDER
-   ========================================== */
+/* =========================================
+   TICKER
+========================================= */
 
-function render() {
+function createTicker(){
+
+    const available =
+        items.filter(
+            item =>
+                !item.unavailable
+        );
+
+
+    const ticker =
+        document.getElementById(
+            "tickerTrack"
+        );
+
+
+    const list =
+        [
+            ...available,
+            ...available
+        ];
+
+
+    ticker.innerHTML =
+        list.map(
+            item => `
+
+                <div class="ticker-item">
+
+                    ${item.icon}
+
+                    <b>
+                        ${item.name}
+                    </b>
+
+                    ·
+
+                    ${money(
+                        getPrice(item)
+                    )}
+
+                </div>
+
+            `
+        ).join("");
+
+}
+
+
+/* =========================================
+   RENDER
+========================================= */
+
+function render(){
 
     renderTrade(
         yourTrade,
         "yourItems",
-        "removeYourItem"
+        "your"
     );
 
 
     renderTrade(
         theirTrade,
         "theirItems",
-        "removeTheirItem"
+        "their"
     );
 
 
-    const yourTotal =
-        calculateTotal(yourTrade);
-
-    const theirTotal =
-        calculateTotal(theirTrade);
-
-
-    document.getElementById("yourTotal")
-        .textContent =
-        money(yourTotal);
-
-
-    document.getElementById("theirTotal")
-        .textContent =
-        money(theirTotal);
-
-
-    const resultTitle =
-        document.getElementById("resultTitle");
-
-    const difference =
-        document.getElementById("difference");
-
-
-    if (
-        yourTrade.length === 0 &&
-        theirTrade.length === 0
-    ) {
-
-        resultTitle.textContent =
-            "Add items to calculate the trade";
-
-        difference.textContent = "";
-
-        return;
-
-    }
-
-
-    const diff =
-        Math.abs(yourTotal - theirTotal);
-
-
-    if (diff < 0.25) {
-
-        resultTitle.textContent =
-            "⚖️ VERY CLOSE TRADE";
-
-    } else if (yourTotal > theirTotal) {
-
-        resultTitle.textContent =
-            "📈 YOUR OFFER IS WORTH MORE";
-
-    } else {
-
-        resultTitle.textContent =
-            "📈 THEIR OFFER IS WORTH MORE";
-
-    }
-
-
-    difference.textContent =
-        "Difference: " + money(diff);
+    updateResult();
 
 }
 
 
-/* ==========================================
-   UPDATE EVERYTHING EVERY 30 SECONDS
-   ========================================== */
+/* =========================================
+   REFRESH
+========================================= */
 
-function updateEverything() {
+function refresh(){
+
+    createMenus();
 
     updateStatus();
 
-    updateValues();
+    renderValues();
+
+    createTicker();
 
     render();
 
 }
 
 
-/* START */
-
-createMenus();
-
-updateEverything();
+refresh();
 
 
-/*
-   Recalculate automatically so prices
-   change when school hours begin/end.
-*/
+/* update automatically */
 
-setInterval(updateEverything, 30000);
+setInterval(
+    refresh,
+    30000
+);
+
+
+/* Enter key */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if(
+            event.key === "Enter" &&
+            document.activeElement.id ===
+            "yourQuantity"
+        ){
+
+            addItem("your");
+
+        }
+
+
+        if(
+            event.key === "Enter" &&
+            document.activeElement.id ===
+            "theirQuantity"
+        ){
+
+            addItem("their");
+
+        }
+
+    }
+);
 
 </script>
 
