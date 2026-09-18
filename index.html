@@ -9,6 +9,8 @@
   <meta name="theme-color" content="#b30000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Carr Hill Trading">
+  <meta name="apple-mobile-web-app-title" content="Carr Hill Trading">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./logo.svg" type="image/svg+xml">
@@ -2883,6 +2885,18 @@ document.addEventListener("DOMContentLoaded",()=>{
   while(w.nextNode()) if(w.currentNode.nodeValue.includes("\\n")) bad.push(w.currentNode);
   bad.forEach(n=>n.nodeValue=n.nodeValue.replace(/\\n/g,""));
 });
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(console.error));
+}
+let deferredInstallPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstallPrompt=e;});
+async function installCarrHill(){
+  if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return;}
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  showToast(ios?"On iPhone: Share → Add to Home Screen":"Browser menu → Install app / Add to Home screen");
+}
 </script>
 </body>
 </html>
