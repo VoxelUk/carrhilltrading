@@ -2390,7 +2390,10 @@ async function loadAnnouncement(){
   const {data}=await supabaseClient.from("announcements").select("*").eq("active",true).order("created_at",{ascending:false}).limit(1).maybeSingle();
   const b=document.getElementById("announcementBar"); if(!b)return;
   if(!data){b.classList.add("hidden");return}
-  b.textContent=(data.style==="important"?"🚨 ":data.style==="party"?"🎉 ":"📢 ")+data.message; b.classList.remove("hidden");
+  b.textContent=(data.style==="important"?"🚨 ":data.style==="party"?"🎉 ":"📢 ")+data.message;
+  b.classList.remove("hidden");
+  clearTimeout(window.announcementHideTimer);
+  window.announcementHideTimer=setTimeout(()=>b.classList.add("hidden"),10000);
 }
 async function publishAnnouncement(){
   if(currentUser?.id!==DEV_ID)return;
