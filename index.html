@@ -550,8 +550,9 @@
       CARR HILL
     </div>
 
-    <div class="online">
-      ● ONLINE
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="headerAdminBtn" class="secondary hidden" onclick="openPage('admin')" style="padding:7px 10px">🔨 Admin</button>
+      <div class="online">● ONLINE</div>
     </div>
 
   </header>
@@ -1302,7 +1303,9 @@ async function loadProfile() {
   }
 
   currentProfile = data ? { ...data, id: currentUser.id } : { id: currentUser.id, role: "user" };
-  document.getElementById("adminShortcut")?.classList.toggle("hidden", currentUser.id !== DEV_ID);
+  const isDeveloper = currentUser.id.toLowerCase() === DEV_ID.toLowerCase();
+  document.getElementById("adminShortcut")?.classList.toggle("hidden", !isDeveloper);
+  document.getElementById("headerAdminBtn")?.classList.toggle("hidden", !isDeveloper);
   const username =
     data?.username ||
     currentUser.user_metadata?.username ||
