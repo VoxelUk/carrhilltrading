@@ -1247,6 +1247,11 @@ async function login() {
 
 async function logout() {
 
+  if (presenceChannel) {
+    try { await presenceChannel.untrack(); } catch(e) {}
+    await supabaseClient.removeChannel(presenceChannel);
+    presenceChannel = null;
+  }
   await supabaseClient.auth.signOut();
 
   currentUser = null;
@@ -1841,13 +1846,20 @@ async function loadFriends() {
   if (friendIds.length) {
 
     const {
-      data: profiles
+      data: profiles,
+      error: profileError
     } = await supabaseClient
       .from("profile")
       .select("id, username, role")
       .in("id", friendIds);
 
-    friends = profiles || [];
+    if (profileError) console.error("Friend profile loading error:", profileError);
+    const profileMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
+    friends = friendIds.map(id => profileMap[id] || {
+      id,
+      username: id === DEV_ID ? "ilikebeagles12346" : "Friend",
+      role: id === DEV_ID ? "admin" : "user"
+    });
   }
 
   renderFriends();
@@ -2411,7 +2423,7 @@ async function sendMessage(){
   const i=document.getElementById("chatInput"),message=i.value.trim();
   if(!activeChatFriend){showToast("Select a friend first");return} if(!message)return;
   const {error}=await supabaseClient.from("messages").insert({sender_id:currentUser.id,receiver_id:activeChatFriend,message});
-  if(error){showToast("Could not send message");console.error(error);return} i.value=""; await loadMessages();
+  if(error){showToast("Could not send message: "+error.message);console.error(error);return} i.value=""; await loadMessages();
 }
 async function loadAnnouncement(){
   const {data}=await supabaseClient.from("announcements").select("*").eq("active",true).order("created_at",{ascending:false}).limit(1).maybeSingle();
