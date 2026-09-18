@@ -14,5 +14,27 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "id": "./",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait-primary",
+  "categories": [
+    "social",
+    "utilities"
+  ],
+  "shortcuts": [
+    {
+      "name": "Trade Calculator",
+      "short_name": "Trade",
+      "url": "./"
+    },
+    {
+      "name": "Friends",
+      "short_name": "Friends",
+      "url": "./"
+    }
   ]
 }
