@@ -299,7 +299,7 @@
 
     .stat strong {
       display: block;
-      font-size: 22px;
+      font-size: 20px;
       color: #ff2929;
     }
 
@@ -416,7 +416,7 @@
       z-index: 50;
       height: 70px;
       display: grid;
-      grid-template-columns: repeat(5,1fr);
+      grid-template-columns: repeat(6,minmax(0,1fr));
       background: rgba(10,10,10,.94);
       backdrop-filter: blur(20px);
       border-top: 1px solid #252525;
@@ -426,7 +426,9 @@
       border: 0;
       background: transparent;
       color: #777;
-      font-size: 12px;
+      font-size: 11px;
+      min-width: 0;
+      padding: 6px 2px;
     }
 
     .nav-btn span {
