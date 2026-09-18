@@ -408,6 +408,38 @@
 
     /* NAV */
 
+    /* v24 visual polish */
+    body{overflow-x:hidden;background-attachment:fixed}
+    body::after{content:"";position:fixed;inset:-30%;z-index:-1;pointer-events:none;background:radial-gradient(circle,rgba(255,25,25,.09) 0,transparent 42%);animation:ambientFloat 13s ease-in-out infinite alternate}
+    @keyframes ambientFloat{from{transform:translate(-8%,-5%) scale(1)}to{transform:translate(12%,8%) scale(1.18)}}
+    .card{position:relative;overflow:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),border-color .28s,box-shadow .28s;background:linear-gradient(145deg,rgba(25,25,25,.9),rgba(11,11,11,.88))}
+    .card::before{content:"";position:absolute;left:-35%;top:-120%;width:55%;height:300%;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.035),transparent);transform:rotate(18deg);transition:left .65s ease}
+    .card:hover::before{left:120%}
+    .card:hover{transform:translateY(-3px);border-color:rgba(255,40,40,.38);box-shadow:0 18px 45px rgba(0,0,0,.35),0 0 25px rgba(180,0,0,.08)}
+    .primary,.secondary,.danger{position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .22s ease,filter .22s ease}
+    .primary:hover,.secondary:hover,.danger:hover{transform:translateY(-2px);filter:brightness(1.1)}
+    .primary:active,.secondary:active,.danger:active{transform:scale(.96)}
+    input,select,textarea{transition:border-color .22s,box-shadow .22s,transform .22s}
+    input:focus,select:focus,textarea:focus{transform:translateY(-1px);box-shadow:0 0 0 3px rgba(220,0,0,.11),0 8px 22px rgba(0,0,0,.2)}
+    .item-row,.friend-result,.friend-card,.chat-message{animation:softEntry .32s cubic-bezier(.2,.8,.2,1) both}
+    @keyframes softEntry{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+    .trade-total{animation:totalGlow 3s ease-in-out infinite}
+    @keyframes totalGlow{50%{text-shadow:0 0 15px rgba(255,45,45,.55)}}
+    .bottom-nav{box-shadow:0 -12px 40px rgba(0,0,0,.4)}
+    .nav-btn{transition:color .2s,transform .22s,background .22s}
+    .nav-btn:hover{transform:translateY(-2px)}
+    .nav-btn.active{transform:translateY(-3px);background:linear-gradient(180deg,rgba(180,0,0,.12),transparent)}
+    .nav-btn.active span{animation:navBounce .38s cubic-bezier(.2,.9,.3,1.35)}
+    @keyframes navBounce{0%{transform:scale(.8)}65%{transform:scale(1.22)}100%{transform:scale(1)}}
+    .page.active>.card,.page.active>.admin-grid>.card{animation:pageCardIn .42s cubic-bezier(.2,.8,.2,1) both}
+    .page.active>.card:nth-child(2),.page.active>.admin-grid>.card:nth-child(2){animation-delay:.05s}
+    .page.active>.card:nth-child(3){animation-delay:.1s}
+    @keyframes pageCardIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+    #connectionBadge{padding:5px 9px;border-radius:999px;background:rgba(40,255,90,.06);border:1px solid rgba(70,255,110,.12)}
+    #connectionBadge.offline{background:rgba(255,170,60,.07);border-color:rgba(255,170,60,.16)}
+    @media(max-width:600px){.card:hover{transform:none}.nav-btn{font-size:10px}.nav-btn span{font-size:19px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}}
+    
     .bottom-nav {
       position: fixed;
       bottom: 0;
