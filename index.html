@@ -563,7 +563,7 @@
 
     <div style="display:flex;align-items:center;gap:10px">
       <button id="headerAdminBtn" class="secondary hidden" onclick="openPage('admin')" style="padding:7px 10px">🔨 Admin</button>
-      <div class="online">● ONLINE</div>
+      <div class="online">● <span id="onlineCount">1 ONLINE</span></div>
     </div>
 
   </header>
@@ -1034,6 +1034,7 @@ let incomingRequests = [];
 let incomingTrades = [];
 let currentProfile = null;
 let activeChatFriend = null;
+let presenceChannel = null;
 const DEV_ID = "4d42240e-fe81-49e5-a4d5-2b0f23262fe0";
 
 function roleBadge(profile) {
@@ -1292,6 +1293,7 @@ async function loadUser() {
   await loadTrades();
 
   setupRealtime();
+  setupPresence();
 }
 
 
@@ -2550,6 +2552,29 @@ async function setRole(id,role){
 /* =========================================================
    REALTIME
 ========================================================= */
+
+function setupPresence(){
+  if(!currentUser)return;
+  if(presenceChannel) supabaseClient.removeChannel(presenceChannel);
+  const username=(currentUser.id===DEV_ID?"ilikebeagles12346":currentProfile?.username)||currentUser.user_metadata?.username||"User";
+  presenceChannel=supabaseClient.channel("carr-hill-presence",{config:{presence:{key:currentUser.id}}});
+  const update=()=>{
+    const state=presenceChannel.presenceState();
+    const count=Object.keys(state).length;
+    const el=document.getElementById("onlineCount");
+    if(el)el.textContent=count+" ONLINE";
+  };
+  presenceChannel
+    .on("presence",{event:"sync"},update)
+    .on("presence",{event:"join"},update)
+    .on("presence",{event:"leave"},update)
+    .subscribe(async status=>{
+      if(status==="SUBSCRIBED"){
+        await presenceChannel.track({user_id:currentUser.id,username,online_at:new Date().toISOString()});
+        update();
+      }
+    });
+}
 
 function setupRealtime() {
 
