@@ -1307,7 +1307,7 @@ async function loadProfile() {
   document.getElementById("adminShortcut")?.classList.toggle("hidden", !isDeveloper);
   document.getElementById("headerAdminBtn")?.classList.toggle("hidden", !isDeveloper);
   const username =
-    data?.username ||
+    (currentUser.id === DEV_ID ? "ilikebeagles12346" : data?.username) ||
     currentUser.user_metadata?.username ||
     currentUser.email?.split("@")[0] ||
     "User";
@@ -1318,7 +1318,7 @@ async function loadProfile() {
 
   if (welcomeEl) {
     welcomeEl.textContent =
-      `Welcome, ${username} 👋`;
+      `Welcome, ${username}${currentUser.id === DEV_ID ? " 🔨" : ""} 👋`;
   }
 }
 
@@ -1629,23 +1629,9 @@ async function openCreatorProfile() {
 
   if (!currentUser) return;
 
-  const creatorUsername = "ilikebeagles12346";
-
-  const { data, error } = await supabaseClient
-    .from("profile")
-    .select("id, username")
-    .ilike("username", creatorUsername)
-    .maybeSingle();
-
-  if (error || !data) {
-    console.error(error);
-    showToast("Creator account not found yet");
-    return;
-  }
-
-  if (data.id === currentUser.id) {
+  if (currentUser.id === DEV_ID) {
     openPage("profile");
-    showToast("That's your creator account");
+    showToast("That's your creator account 🔨");
     return;
   }
 
@@ -1656,16 +1642,16 @@ async function openCreatorProfile() {
   results.innerHTML = `
     <div class="friend-result">
       <div>
-        <div class="username">${escapeHTML(data.username)}</div>
-        <div class="user-id">Carr Hill Trading creator</div>
+        <div class="username">ilikebeagles12346 <span class="dev-badge" title="Developer">🔨</span></div>
+        <div class="user-id">Carr Hill Trading developer</div>
       </div>
-      <button class="secondary" onclick="sendFriendRequest('${data.id}')">
+      <button class="secondary" onclick="sendFriendRequest('${DEV_ID}')">
         Add Friend
       </button>
     </div>
   `;
 
-  document.getElementById("friendSearch").value = data.username;
+  document.getElementById("friendSearch").value = "ilikebeagles12346";
 }
 
 /* =========================================================
