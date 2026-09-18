@@ -416,6 +416,10 @@
       color: #ff2525;
     }
 
+    #tacoRain{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden}
+    .falling-taco{position:absolute;top:-70px;font-size:42px;animation:tacoFall linear forwards;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45))}
+    @keyframes tacoFall{to{transform:translateY(115vh) rotate(900deg)}}
+
     /* TOAST */
 
     #toast {
@@ -824,6 +828,10 @@
           <select id="announcementStyle"><option value="normal">Normal</option><option value="important">🚨 Important</option><option value="party">🎉 Party</option></select>
           <button class="primary" onclick="publishAnnouncement()">Publish</button><br><br>
           <button class="danger" onclick="clearAnnouncements()">Clear announcement</button>
+          <hr style="border:0;border-top:1px solid #333;margin:22px 0">
+          <h3>🌮 Taco Tuesday</h3>
+          <p class="muted">Make tacos rain on everyone's screen for 15 seconds.</p>
+          <button class="primary" onclick="startTacoTuesday()">🌮 START TACO TUESDAY</button>
         </div>
         <div class="card">
           <h3>🛡️ Moderator Manager</h3>
@@ -930,6 +938,7 @@
 
 
 <div id="toast"></div>
+<div id="tacoRain" aria-hidden="true"></div>
 
 
 <script>
@@ -2393,6 +2402,12 @@ async function loadAnnouncement(){
   const {data}=await supabaseClient.from("announcements").select("*").eq("active",true).order("created_at",{ascending:false}).limit(1).maybeSingle();
   const b=document.getElementById("announcementBar"); if(!b)return;
   if(!data){b.classList.add("hidden");return}
+  if(data.style==="taco"){
+    b.classList.add("hidden");
+    const age=Date.now()-new Date(data.created_at).getTime();
+    if(age<15000) runTacoRain();
+    return;
+  }
   const age=Date.now()-new Date(data.created_at).getTime();
   if(age>=10000){b.classList.add("hidden");return}
   b.textContent=(data.style==="important"?"🚨 ":data.style==="party"?"🎉 ":"📢 ")+data.message;
@@ -2403,6 +2418,30 @@ async function loadAnnouncement(){
     b.textContent="";
   },Math.max(0,10000-age));
 }
+function runTacoRain(){
+  const layer=document.getElementById("tacoRain"); if(!layer)return;
+  layer.innerHTML="";
+  const end=Date.now()+15000;
+  const spawn=()=>{
+    if(Date.now()>=end)return;
+    const t=document.createElement("div");
+    t.className="falling-taco"; t.textContent="🌮";
+    t.style.left=(Math.random()*96)+"%";
+    t.style.animationDuration=(2.4+Math.random()*2.4)+"s";
+    t.style.fontSize=(28+Math.random()*34)+"px";
+    layer.appendChild(t);
+    setTimeout(()=>t.remove(),5000);
+    setTimeout(spawn,120+Math.random()*180);
+  };
+  spawn(); setTimeout(()=>layer.innerHTML="",15500);
+}
+async function startTacoTuesday(){
+  if(currentUser?.id!==DEV_ID)return;
+  const {error}=await supabaseClient.from("announcements").insert({message:"TACO_TUESDAY",style:"taco",created_by:currentUser.id});
+  if(error){showToast("Could not start Taco Tuesday: "+error.message);return}
+  runTacoRain(); showToast("🌮 TACO TUESDAY!");
+}
+
 async function publishAnnouncement(){
   if(currentUser?.id!==DEV_ID)return;
   const i=document.getElementById("announcementInput"),message=i.value.trim(); if(!message)return;
