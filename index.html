@@ -919,6 +919,10 @@
           </div>
         </div>
         <div class="card">
+          <h3>🐛 Recent Bug Reports</h3>
+          <button class="secondary" onclick="loadBugReports()">Refresh reports</button>
+          <div id="adminBugReports"></div>
+          <hr style="border:0;border-top:1px solid #333;margin:22px 0">
           <h3>🛡️ Moderator Manager</h3>
           <input id="adminUserSearch" maxlength="20" placeholder="Search username...">
           <button class="secondary" onclick="adminSearchUsers()">Search users</button>
@@ -963,6 +967,7 @@
         <h3>Account</h3>
 
         <button class="secondary" onclick="showTutorial()" style="margin-bottom:10px;width:100%">▶ Replay Tutorial</button>
+        <button class="secondary" onclick="openBugReport()" style="margin-bottom:10px;width:100%">🐛 Report a Bug</button>
 
         <button class="danger" onclick="logout()">
           Log Out
@@ -1026,6 +1031,16 @@
 
 <div id="toast"></div>
 <div id="tacoRain" aria-hidden="true"></div>
+<div id="bugReportOverlay" class="hidden">
+  <div class="tutorial-card">
+    <div class="tutorial-icon">🐛</div>
+    <h2>Report a Bug</h2>
+    <p style="min-height:0;margin-bottom:12px">Tell the developer what went wrong. Don't include passwords or personal information.</p>
+    <select id="bugType"><option>Something is broken</option><option>Trading / calculator</option><option>Friends / chat</option><option>Account / login</option><option>Visual problem</option><option>Other</option></select>
+    <textarea id="bugMessage" maxlength="500" placeholder="What happened? What were you trying to do?" style="width:100%;min-height:120px;background:#111;color:#fff;border:1px solid #333;border-radius:12px;padding:13px;resize:vertical;margin-bottom:12px"></textarea>
+    <div class="tutorial-actions"><button class="secondary" onclick="closeBugReport()">Cancel</button><button class="primary" onclick="submitBugReport()">Send Report</button></div>
+  </div>
+</div>
 <div id="tutorialOverlay" class="hidden">
   <div class="tutorial-card">
     <div id="tutorialIcon" class="tutorial-icon">👋</div>
@@ -1447,6 +1462,18 @@ async function loadProfile() {
 /* =========================================================
    PAGE NAVIGATION
 ========================================================= */
+
+function openBugReport(){document.getElementById("bugReportOverlay").classList.remove("hidden")}
+function closeBugReport(){document.getElementById("bugReportOverlay").classList.add("hidden")}
+async function submitBugReport(){
+  if(!currentUser)return;
+  if(!navigator.onLine)return showToast("You need internet to send a bug report");
+  const type=document.getElementById("bugType").value,message=document.getElementById("bugMessage").value.trim();
+  if(message.length<5)return showToast("Tell us a little more about the bug");
+  const {error}=await supabaseClient.from("bug_reports").insert({user_id:currentUser.id,category:type,message});
+  if(error){console.error(error);return showToast("Could not send report: "+error.message)}
+  document.getElementById("bugMessage").value="";closeBugReport();showToast("Bug report sent 🐛✓");
+}
 
 const tutorialSteps=[
   {icon:"👋",title:"Welcome to Carr Hill Trading",text:"Quick tour time. This takes about 20 seconds and shows you where everything is."},
@@ -2701,6 +2728,14 @@ async function adminSpotlight(kind){
     const {error}=await supabaseClient.rpc("admin_set_spotlight",{target_user:u.id,title:kind,note});
     if(error)throw error;showToast(kind==="helpful"?"Most Helpful updated 🏆":"Shoutout posted 📣");await loadLeaderboard();
   }catch(e){console.error(e);showToast("Could not post: "+e.message)}
+}
+
+async function loadBugReports(){
+  if(currentUser?.id!==DEV_ID)return;
+  const {data,error}=await supabaseClient.from("bug_reports").select("id,category,message,created_at").order("created_at",{ascending:false}).limit(20);
+  const box=document.getElementById("adminBugReports");if(!box)return;
+  if(error){box.innerHTML='<p class="muted">Could not load reports.</p>';console.error(error);return}
+  box.innerHTML=(data||[]).length?(data||[]).map(r=>'<div class="friend-card" style="align-items:flex-start"><div><b>🐛 '+escapeHTML(r.category)+'</b><p class="muted" style="margin-top:5px">'+escapeHTML(r.message)+'</p><small class="muted">'+new Date(r.created_at).toLocaleString()+'</small></div></div>').join(""):'<p class="muted">No bug reports 🎉</p>';
 }
 
 async function adminSearchUsers(){
