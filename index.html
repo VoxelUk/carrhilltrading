@@ -442,6 +442,31 @@
     .falling-taco{position:absolute;top:-70px;font-size:42px;animation:tacoFall linear forwards;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45))}
     @keyframes tacoFall{to{transform:translateY(115vh) rotate(900deg)}}
 
+
+    /* SMOOTH UI */
+    html{scroll-behavior:smooth}
+    body::before{content:"";position:fixed;inset:-25%;z-index:-1;pointer-events:none;background:radial-gradient(circle,rgba(210,0,0,.10),transparent 38%);animation:bgDrift 12s ease-in-out infinite alternate}
+    @keyframes bgDrift{from{transform:translate(-7%,-4%) scale(1)}to{transform:translate(9%,7%) scale(1.15)}}
+    .page.active{animation:pageIn .32s cubic-bezier(.2,.8,.2,1)}
+    @keyframes pageIn{from{opacity:0;transform:translateY(10px) scale(.992)}to{opacity:1;transform:none}}
+    .card,.hero,.creator-card,.friend-card,.friend-result,.request-card,.offer-card,.trade-side,.stat{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease}
+    .card:hover,.creator-card:hover,.friend-card:hover,.friend-result:hover,.offer-card:hover{transform:translateY(-2px);border-color:rgba(255,50,50,.38);box-shadow:0 12px 34px rgba(0,0,0,.32)}
+    button{transition:transform .14s ease,filter .18s ease,box-shadow .18s ease}
+    button:hover{filter:brightness(1.12)} button:active{transform:scale(.96)}
+    .nav-btn{transition:color .2s ease,transform .2s ease,background .2s ease}.nav-btn.active{transform:translateY(-3px)}.nav-btn.active span{animation:navPop .28s ease}
+    @keyframes navPop{50%{transform:scale(1.25)}}
+    input,select{transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease}
+    input:focus,select:focus{box-shadow:0 0 0 3px rgba(220,0,0,.12);transform:translateY(-1px)}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+    /* FIRST LOGIN TUTORIAL */
+    #tutorialOverlay{position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:22px;background:rgba(0,0,0,.78);backdrop-filter:blur(12px)}
+    .tutorial-card{width:min(470px,100%);padding:26px;border-radius:24px;background:linear-gradient(145deg,rgba(31,12,12,.98),rgba(10,10,10,.98));border:1px solid rgba(255,50,50,.35);box-shadow:0 30px 90px rgba(0,0,0,.7),0 0 45px rgba(180,0,0,.14);animation:tutorialIn .35s cubic-bezier(.2,.8,.2,1)}
+    @keyframes tutorialIn{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+    .tutorial-icon{font-size:42px;margin-bottom:10px}.tutorial-card h2{font-size:25px;margin-bottom:8px}.tutorial-card p{color:#aaa;line-height:1.55;min-height:72px}
+    .tutorial-progress{display:flex;gap:6px;margin:18px 0}.tutorial-dot{height:5px;flex:1;border-radius:10px;background:#333;transition:.25s}.tutorial-dot.active{background:#f22;box-shadow:0 0 12px rgba(255,0,0,.45)}
+    .tutorial-actions{display:flex;gap:9px}.tutorial-actions .primary{flex:1}.tutorial-actions .secondary{min-width:80px}
+
     /* TOAST */
 
     #toast {
@@ -909,6 +934,8 @@
 
         <h3>Account</h3>
 
+        <button class="secondary" onclick="showTutorial()" style="margin-bottom:10px;width:100%">▶ Replay Tutorial</button>
+
         <button class="danger" onclick="logout()">
           Log Out
         </button>
@@ -971,6 +998,18 @@
 
 <div id="toast"></div>
 <div id="tacoRain" aria-hidden="true"></div>
+<div id="tutorialOverlay" class="hidden">
+  <div class="tutorial-card">
+    <div id="tutorialIcon" class="tutorial-icon">👋</div>
+    <h2 id="tutorialTitle">Welcome to Carr Hill Trading</h2>
+    <p id="tutorialText"></p>
+    <div id="tutorialProgress" class="tutorial-progress"></div>
+    <div class="tutorial-actions">
+      <button class="secondary" onclick="finishTutorial()">Skip</button>
+      <button id="tutorialNext" class="primary" onclick="nextTutorial()">Next →</button>
+    </div>
+  </div>
+</div>
 <div id="globalFunLayer" aria-hidden="true"></div>
 
 
@@ -1319,6 +1358,7 @@ async function loadUser() {
 
   setupRealtime();
   setupPresence();
+  maybeShowTutorial();
 }
 
 
@@ -1378,6 +1418,32 @@ async function loadProfile() {
 /* =========================================================
    PAGE NAVIGATION
 ========================================================= */
+
+const tutorialSteps=[
+  {icon:"👋",title:"Welcome to Carr Hill Trading",text:"Quick tour time. This takes about 20 seconds and shows you where everything is."},
+  {icon:"⇄",title:"Check & Send Trades",text:"Use Trades to compare item values, build an offer, and send it straight to one of your friends."},
+  {icon:"♟",title:"Add Friends",text:"Search Carr Hill usernames in Friends, send a request, then accept each other before trading or chatting."},
+  {icon:"💬",title:"Negotiate Privately",text:"Once you're friends, open Chat to negotiate trades. Keep personal details like your real name, location and contact info private."},
+  {icon:"🟢",title:"You're Ready",text:"The live counter shows how many accounts are online. Have fun trading — you can replay this tutorial later from your Profile."}
+];
+let tutorialStep=0;
+function renderTutorial(){
+  const s=tutorialSteps[tutorialStep];
+  document.getElementById("tutorialIcon").textContent=s.icon;
+  document.getElementById("tutorialTitle").textContent=s.title;
+  document.getElementById("tutorialText").textContent=s.text;
+  document.getElementById("tutorialProgress").innerHTML=tutorialSteps.map((_,i)=>'<span class="tutorial-dot '+(i<=tutorialStep?'active':'')+'"></span>').join("");
+  document.getElementById("tutorialNext").textContent=tutorialStep===tutorialSteps.length-1?"Start Trading ✓":"Next →";
+}
+function showTutorial(){tutorialStep=0;document.getElementById("tutorialOverlay").classList.remove("hidden");renderTutorial()}
+function nextTutorial(){if(tutorialStep<tutorialSteps.length-1){tutorialStep++;renderTutorial()}else finishTutorial()}
+function finishTutorial(){
+  document.getElementById("tutorialOverlay").classList.add("hidden");
+  if(currentUser)localStorage.setItem("carrhill_tutorial_"+currentUser.id,"done");
+}
+function maybeShowTutorial(){
+  if(currentUser&&!localStorage.getItem("carrhill_tutorial_"+currentUser.id))setTimeout(showTutorial,350);
+}
 
 function openPage(page) {
 
