@@ -1,1743 +1,2314 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Carr Hill Trading</title>
-
-<meta name="theme-color" content="#080808">
-<meta name="description" content="Carr Hill Trading">
-
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-:root{
-    --bg:#060606;
-    --panel:#101010;
-    --panel2:#151515;
-    --red:#ff1744;
-    --red2:#ff4d6d;
-    --text:#f7f7f7;
-    --muted:#858585;
-    --border:rgba(255,255,255,.08);
-    --green:#39e58c;
-}
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
-html{
-    scroll-behavior:smooth;
-}
-
-body{
-    font-family:Inter,Arial,sans-serif;
-    background:
-        radial-gradient(circle at 20% 10%,rgba(255,23,68,.10),transparent 30%),
-        radial-gradient(circle at 80% 80%,rgba(255,23,68,.06),transparent 30%),
-        var(--bg);
-    color:var(--text);
-    min-height:100vh;
-    overflow-x:hidden;
-}
-
-body:before{
-    content:"";
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    background-image:
-        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
-    background-size:45px 45px;
-    mask-image:linear-gradient(to bottom,black,transparent);
-}
-
-button,input,select{
-    font:inherit;
-}
-
-button{
-    cursor:pointer;
-}
-
-.app{
-    width:min(1180px,94%);
-    margin:auto;
-    padding-bottom:110px;
-}
-
-/* HEADER */
-
-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:24px 0;
-    position:sticky;
-    top:0;
-    z-index:20;
-    background:rgba(6,6,6,.78);
-    backdrop-filter:blur(18px);
-}
-
-.logo{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.logo-icon{
-    width:44px;
-    height:44px;
-    border-radius:14px;
-    display:grid;
-    place-items:center;
-    background:linear-gradient(135deg,#ff1744,#8d001f);
-    box-shadow:0 0 30px rgba(255,23,68,.25);
-    font-size:22px;
-}
-
-.logo h1{
-    font-size:18px;
-    letter-spacing:-.5px;
-}
-
-.logo p{
-    color:var(--muted);
-    font-size:11px;
-    margin-top:2px;
-}
-
-.header-actions{
-    display:flex;
-    gap:8px;
-}
-
-.icon-btn{
-    width:42px;
-    height:42px;
-    border:1px solid var(--border);
-    background:#101010;
-    color:white;
-    border-radius:13px;
-}
-
-/* PAGES */
-
-.page{
-    display:none;
-    animation:pageIn .3s ease;
-}
-
-.page.active{
-    display:block;
-}
-
-@keyframes pageIn{
-    from{
-        opacity:0;
-        transform:translateY(8px);
-    }
-    to{
-        opacity:1;
-        transform:none;
-    }
-}
-
-/* HERO */
-
-.hero{
-    padding:48px 0 30px;
-}
-
-.hero h2{
-    font-size:clamp(38px,7vw,72px);
-    line-height:.95;
-    letter-spacing:-4px;
-    max-width:750px;
-}
-
-.hero h2 span{
-    color:var(--red);
-}
-
-.hero p{
-    color:var(--muted);
-    margin-top:18px;
-    max-width:600px;
-    line-height:1.6;
-}
-
-.status{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    margin-top:24px;
-    padding:8px 12px;
-    border-radius:100px;
-    background:#101010;
-    border:1px solid var(--border);
-    font-size:12px;
-}
-
-.status-dot{
-    width:7px;
-    height:7px;
-    border-radius:50%;
-    background:var(--green);
-    box-shadow:0 0 12px var(--green);
-}
-
-/* CARDS */
-
-.card{
-    background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
-    border:1px solid var(--border);
-    border-radius:24px;
-    padding:22px;
-    box-shadow:0 20px 70px rgba(0,0,0,.25);
-}
-
-.section-title{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:18px;
-}
-
-.section-title h3{
-    font-size:18px;
-}
-
-.section-title span{
-    color:var(--muted);
-    font-size:12px;
-}
-
-/* NAV TABS */
-
-.tabs{
-    display:flex;
-    gap:8px;
-    overflow-x:auto;
-    margin:15px 0 28px;
-    scrollbar-width:none;
-}
-
-.tabs::-webkit-scrollbar{
-    display:none;
-}
-
-.tab{
-    white-space:nowrap;
-    border:1px solid var(--border);
-    background:#0d0d0d;
-    color:#aaa;
-    padding:10px 15px;
-    border-radius:12px;
-}
-
-.tab.active{
-    color:white;
-    background:var(--red);
-    border-color:var(--red);
-}
-
-/* AUTH */
-
-.auth-wrap{
-    min-height:70vh;
-    display:grid;
-    place-items:center;
-}
-
-.auth{
-    width:min(440px,100%);
-}
-
-.auth-logo{
-    text-align:center;
-    margin-bottom:24px;
-}
-
-.auth-logo .logo-icon{
-    display:inline-grid;
-}
-
-.auth h2{
-    text-align:center;
-    margin-top:15px;
-    font-size:30px;
-}
-
-.auth-sub{
-    text-align:center;
-    color:var(--muted);
-    font-size:13px;
-    margin:8px 0 24px;
-}
-
-.field{
-    margin-bottom:13px;
-}
-
-.field label{
-    display:block;
-    color:#aaa;
-    font-size:12px;
-    margin-bottom:7px;
-}
-
-.field input,
-.field select{
-    width:100%;
-    padding:14px;
-    border-radius:13px;
-    border:1px solid var(--border);
-    outline:none;
-    color:white;
-    background:#090909;
-}
-
-.field input:focus,
-.field select:focus{
-    border-color:rgba(255,23,68,.7);
-    box-shadow:0 0 0 3px rgba(255,23,68,.08);
-}
-
-.primary{
-    width:100%;
-    border:0;
-    background:linear-gradient(135deg,#ff1744,#c90032);
-    color:white;
-    padding:14px;
-    border-radius:14px;
-    font-weight:700;
-    margin-top:6px;
-    box-shadow:0 10px 30px rgba(255,23,68,.18);
-}
-
-.secondary{
-    border:1px solid var(--border);
-    background:#111;
-    color:white;
-    padding:11px 15px;
-    border-radius:12px;
-}
-
-.text-button{
-    border:0;
-    background:none;
-    color:#ff4d6d;
-    margin-top:15px;
-    width:100%;
-}
-
-/* TRADE */
-
-.trade-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:18px;
-}
-
-.trade-side{
-    min-height:300px;
-}
-
-.trade-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:18px;
-}
-
-.trade-user{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.avatar{
-    width:38px;
-    height:38px;
-    border-radius:12px;
-    display:grid;
-    place-items:center;
-    background:#1d1d1d;
-}
-
-.trade-items{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    min-height:120px;
-}
-
-.empty{
-    display:grid;
-    place-items:center;
-    min-height:110px;
-    color:#555;
-    text-align:center;
-    font-size:13px;
-}
-
-.item{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:11px;
-    border:1px solid var(--border);
-    background:#0b0b0b;
-    border-radius:14px;
-    animation:itemIn .25s ease;
-}
-
-@keyframes itemIn{
-    from{
-        opacity:0;
-        transform:translateY(5px);
-    }
-    to{
-        opacity:1;
-        transform:none;
-    }
-}
-
-.item-icon{
-    width:38px;
-    height:38px;
-    display:grid;
-    place-items:center;
-    border-radius:11px;
-    background:#171717;
-    font-size:20px;
-}
-
-.item-info{
-    flex:1;
-}
-
-.item-info strong{
-    display:block;
-    font-size:13px;
-}
-
-.item-info small{
-    color:var(--muted);
-}
-
-.item-price{
-    font-size:13px;
-    font-weight:700;
-}
-
-.remove{
-    border:0;
-    background:#191919;
-    color:#888;
-    width:28px;
-    height:28px;
-    border-radius:9px;
-}
-
-.trade-total{
-    display:flex;
-    justify-content:space-between;
-    border-top:1px solid var(--border);
-    margin-top:16px;
-    padding-top:16px;
-    font-weight:700;
-}
-
-.controls{
-    display:grid;
-    grid-template-columns:1fr 90px auto;
-    gap:8px;
-    margin-top:15px;
-}
-
-.controls select,
-.controls input{
-    min-width:0;
-    border:1px solid var(--border);
-    background:#0b0b0b;
-    color:white;
-    border-radius:12px;
-    padding:11px;
-}
-
-.add{
-    border:0;
-    background:var(--red);
-    color:white;
-    border-radius:12px;
-    padding:0 16px;
-    font-weight:700;
-}
-
-/* RESULT */
-
-.result{
-    margin-top:18px;
-    text-align:center;
-}
-
-.result-main{
-    font-size:25px;
-    font-weight:800;
-}
-
-.result-sub{
-    color:var(--muted);
-    margin-top:7px;
-}
-
-.meter{
-    height:7px;
-    background:#1a1a1a;
-    border-radius:100px;
-    margin-top:18px;
-    overflow:hidden;
-}
-
-.meter-fill{
-    height:100%;
-    width:50%;
-    background:linear-gradient(90deg,#ff1744,#ff7b93);
-    transition:width .5s ease;
-}
-
-/* VALUES */
-
-.values{
-    margin-top:18px;
-}
-
-.value-row{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:13px 0;
-    border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-.value-row:last-child{
-    border-bottom:0;
-}
-
-.value-icon{
-    width:38px;
-    height:38px;
-    display:grid;
-    place-items:center;
-    background:#161616;
-    border-radius:11px;
-}
-
-.value-name{
-    flex:1;
-}
-
-.value-name strong{
-    display:block;
-}
-
-.value-name small{
-    color:var(--muted);
-}
-
-.value-number{
-    text-align:right;
-}
-
-.value-number strong{
-    display:block;
-}
-
-.value-number small{
-    color:var(--muted);
-}
-
-/* FRIENDS */
-
-.search{
-    display:flex;
-    gap:8px;
-    margin-bottom:15px;
-}
-
-.search input{
-    flex:1;
-    padding:13px;
-    border-radius:13px;
-    border:1px solid var(--border);
-    background:#0b0b0b;
-    color:white;
-    outline:none;
-}
-
-.friend{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:13px 0;
-    border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-.friend-info{
-    flex:1;
-}
-
-.friend-info strong{
-    display:block;
-}
-
-.friend-info small{
-    color:var(--muted);
-}
-
-/* PROFILE */
-
-.profile{
-    text-align:center;
-}
-
-.profile-avatar{
-    width:82px;
-    height:82px;
-    border-radius:25px;
-    display:grid;
-    place-items:center;
-    background:linear-gradient(135deg,#ff1744,#650018);
-    margin:5px auto 15px;
-    font-size:34px;
-}
-
-.stats{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:8px;
-    margin-top:22px;
-}
-
-.stat{
-    padding:17px 8px;
-    border:1px solid var(--border);
-    border-radius:15px;
-    background:#0c0c0c;
-}
-
-.stat strong{
-    display:block;
-    font-size:20px;
-}
-
-.stat small{
-    color:var(--muted);
-}
-
-/* BOTTOM NAV */
-
-.bottom-nav{
-    position:fixed;
-    bottom:14px;
-    left:50%;
-    transform:translateX(-50%);
-    width:min(560px,92%);
-    padding:8px;
-    background:rgba(15,15,15,.88);
-    backdrop-filter:blur(20px);
-    border:1px solid var(--border);
-    border-radius:20px;
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    z-index:50;
-    box-shadow:0 15px 50px rgba(0,0,0,.45);
-}
-
-.nav-btn{
-    border:0;
-    background:none;
-    color:#777;
-    padding:10px 5px;
-    border-radius:14px;
-    font-size:11px;
-}
-
-.nav-btn span{
-    display:block;
-    font-size:19px;
-    margin-bottom:3px;
-}
-
-.nav-btn.active{
-    color:white;
-    background:#1a1a1a;
-}
-
-/* TOAST */
-
-.toast{
-    position:fixed;
-    top:20px;
-    left:50%;
-    transform:translate(-50%,-20px);
-    opacity:0;
-    pointer-events:none;
-    z-index:100;
-    background:#171717;
-    border:1px solid var(--border);
-    padding:12px 17px;
-    border-radius:13px;
-    transition:.25s;
-    font-size:13px;
-}
-
-.toast.show{
-    opacity:1;
-    transform:translate(-50%,0);
-}
-
-/* RESPONSIVE */
-
-@media(max-width:760px){
-    .app{
-        width:92%;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Carr Hill Trading</title>
+
+  <meta name="theme-color" content="#b30000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    header{
-        padding:15px 0;
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(180,0,0,.22), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(120,0,0,.18), transparent 35%),
+        #070707;
+      color: white;
+      min-height: 100vh;
     }
 
-    .hero{
-        padding-top:30px;
+    button,
+    input,
+    select {
+      font: inherit;
     }
 
-    .hero h2{
-        letter-spacing:-2px;
+    button {
+      cursor: pointer;
     }
 
-    .trade-grid{
-        grid-template-columns:1fr;
+    .hidden {
+      display: none !important;
     }
 
-    .controls{
-        grid-template-columns:1fr 75px;
+    .screen {
+      min-height: 100vh;
     }
 
-    .add{
-        grid-column:1/-1;
-        padding:12px;
+    /* AUTH */
+
+    #authScreen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 25px;
     }
 
-    .card{
-        padding:17px;
-        border-radius:19px;
+    .auth-box {
+      width: 100%;
+      max-width: 430px;
+      padding: 30px;
+      border: 1px solid rgba(255,0,0,.25);
+      border-radius: 24px;
+      background: rgba(18,18,18,.85);
+      box-shadow: 0 20px 60px rgba(0,0,0,.6);
+      backdrop-filter: blur(20px);
     }
-}
-</style>
+
+    .logo {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 900;
+      color: #ff1b1b;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #999;
+      margin-bottom: 28px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tabs button {
+      flex: 1;
+      background: #151515;
+      border: 1px solid #292929;
+      color: #aaa;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .tabs button.active {
+      background: #a90000;
+      color: white;
+      border-color: #ff2525;
+    }
+
+    input,
+    select {
+      width: 100%;
+      background: #111;
+      color: white;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 13px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #e00000;
+    }
+
+    .primary {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 13px;
+      background: linear-gradient(135deg,#ff2020,#8d0000);
+      color: white;
+      font-weight: 800;
+    }
+
+    .secondary {
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 9px 13px;
+      background: #151515;
+      color: white;
+    }
+
+    .danger {
+      border: 1px solid #7d0000;
+      border-radius: 10px;
+      padding: 9px 13px;
+      background: #260000;
+      color: #ff7d7d;
+    }
+
+    /* APP */
+
+    #appScreen {
+      padding-bottom: 85px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 17px 20px;
+      background: rgba(7,7,7,.88);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid #222;
+    }
+
+    .header-logo {
+      color: #ff2424;
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .online {
+      color: #5cff78;
+      font-size: 12px;
+    }
+
+    main {
+      width: 100%;
+      max-width: 1000px;
+      margin: auto;
+      padding: 22px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .hero {
+      padding: 25px;
+      border-radius: 22px;
+      background: linear-gradient(
+        135deg,
+        rgba(160,0,0,.35),
+        rgba(25,25,25,.8)
+      );
+      border: 1px solid rgba(255,0,0,.18);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      color: #aaa;
+    }
+
+    .card {
+      background: rgba(18,18,18,.8);
+      border: 1px solid #282828;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 15px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.2);
+    }
+
+    .card h2,
+    .card h3 {
+      margin-bottom: 14px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 10px;
+    }
+
+    .stat {
+      background: #101010;
+      border: 1px solid #272727;
+      padding: 15px;
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      color: #ff2929;
+    }
+
+    .muted {
+      color: #888;
+    }
+
+    /* TRADES */
+
+    .trade-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .trade-side {
+      background: #101010;
+      border: 1px solid #292929;
+      border-radius: 16px;
+      padding: 15px;
+    }
+
+    .trade-side h3 {
+      color: #ff2929;
+    }
+
+    .item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      background: #181818;
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+
+    .item-row small {
+      color: #aaa;
+      display: block;
+    }
+
+    .quantity {
+      width: 70px;
+      margin: 0;
+      padding: 8px;
+    }
+
+    .remove {
+      background: transparent;
+      color: #ff5555;
+      border: 0;
+      font-size: 18px;
+    }
+
+    .trade-total {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #292929;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .trade-result {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 12px;
+      background: #180000;
+      border: 1px solid #560000;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    /* FRIENDS */
+
+    .friend-result,
+    .friend-card,
+    .request-card,
+    .offer-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: #121212;
+      border: 1px solid #292929;
+      border-radius: 13px;
+      margin-top: 10px;
+    }
+
+    .username {
+      font-weight: 800;
+    }
+
+    .user-id {
+      font-size: 11px;
+      color: #666;
+      margin-top: 3px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* NAV */
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      height: 70px;
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      background: rgba(10,10,10,.94);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid #252525;
+    }
+
+    .nav-btn {
+      border: 0;
+      background: transparent;
+      color: #777;
+      font-size: 12px;
+    }
+
+    .nav-btn span {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 2px;
+    }
+
+    .nav-btn.active {
+      color: #ff2525;
+    }
+
+    /* TOAST */
+
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 88px;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: #151515;
+      border: 1px solid #444;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      display: none;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    @media(max-width:700px) {
+      main {
+        padding: 15px;
+      }
+
+      .trade-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 26px;
+      }
+
+      .friend-result,
+      .friend-card,
+      .request-card,
+      .offer-card {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .friend-result button,
+      .friend-card button,
+      .request-card button,
+      .offer-card button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="toast" class="toast"></div>
+<!-- ================= AUTH ================= -->
 
-<div class="app">
+<section id="authScreen" class="screen">
 
-<header>
-    <div class="logo">
-        <div class="logo-icon">🏫</div>
-        <div>
-            <h1>Carr Hill Trading</h1>
-            <p>School trading network</p>
-        </div>
+  <div class="auth-box">
+
+    <div class="logo">CARR HILL</div>
+    <div class="subtitle">Trading App</div>
+
+    <div class="tabs">
+      <button id="loginTab" class="active" onclick="showAuth('login')">
+        Login
+      </button>
+
+      <button id="signupTab" onclick="showAuth('signup')">
+        Sign Up
+      </button>
     </div>
 
-    <div class="header-actions">
-        <button class="icon-btn" onclick="showPage('profile')">👤</button>
+    <div id="loginForm">
+
+      <input
+        id="loginEmail"
+        type="email"
+        placeholder="Email"
+      >
+
+      <input
+        id="loginPassword"
+        type="password"
+        placeholder="Password"
+      >
+
+      <button class="primary" onclick="login()">
+        Login
+      </button>
+
     </div>
-</header>
 
-<!-- AUTH PAGE -->
+    <div id="signupForm" class="hidden">
 
-<section id="authPage" class="page active">
+      <input
+        id="signupUsername"
+        type="text"
+        placeholder="Username"
+        maxlength="20"
+      >
 
-<div class="auth-wrap">
-<div class="auth card">
+      <input
+        id="signupEmail"
+        type="email"
+        placeholder="Email"
+      >
 
-    <div class="auth-logo">
-        <div class="logo-icon">🏫</div>
-        <h2 id="authTitle">Welcome back</h2>
-        <p class="auth-sub" id="authSubtitle">
-            Sign in to Carr Hill Trading
+      <input
+        id="signupPassword"
+        type="password"
+        placeholder="Password"
+      >
+
+      <button class="primary" onclick="signup()">
+        Create Account
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= APP ================= -->
+
+<section id="appScreen" class="screen hidden">
+
+  <header>
+
+    <div class="header-logo">
+      CARR HILL
+    </div>
+
+    <div class="online">
+      ● ONLINE
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <!-- HOME -->
+
+    <section id="homePage" class="page active">
+
+      <div class="hero">
+
+        <h1 id="welcomeText">
+          Welcome 👋
+        </h1>
+
+        <p>
+          Trade school items with your friends.
         </p>
-    </div>
 
-    <div id="usernameField" class="field" style="display:none">
-        <label>Username</label>
-        <input id="username" placeholder="yourusername" maxlength="20">
-    </div>
+      </div>
 
-    <div class="field">
-        <label>Email</label>
-        <input id="email" type="email" placeholder="you@example.com">
-    </div>
+      <div class="stat-grid">
 
-    <div class="field">
-        <label>Password</label>
-        <input id="password" type="password" placeholder="••••••••">
-    </div>
+        <div class="stat">
+          <strong id="friendCount">0</strong>
+          Friends
+        </div>
 
-    <button class="primary" onclick="submitAuth()" id="authButton">
-        Sign in
-    </button>
+        <div class="stat">
+          <strong id="pendingCount">0</strong>
+          Requests
+        </div>
 
-    <button class="text-button" onclick="toggleAuth()" id="authToggle">
-        Need an account? Sign up
-    </button>
+        <div class="stat">
+          <strong id="offerCount">0</strong>
+          Offers
+        </div>
 
-</div>
-</div>
+      </div>
 
-</section>
+      <div class="card" style="margin-top:15px">
 
-<!-- HOME -->
+        <h2>Quick Trade</h2>
 
-<section id="homePage" class="page">
+        <p class="muted">
+          Use the calculator to check item values.
+        </p>
 
-<div class="hero">
-    <div class="status">
-        <span class="status-dot"></span>
-        <span id="onlineText">ONLINE</span>
-    </div>
+        <br>
 
-    <h2>
-        Trade.<br>
-        Connect.<br>
-        <span>Repeat.</span>
-    </h2>
+        <button class="primary" onclick="openPage('trades')">
+          Open Calculator
+        </button>
 
-    <p>
-        Trade school items with your friends, compare values
-        and keep track of your offers.
-    </p>
-</div>
+      </div>
 
-<div class="card">
-    <div class="section-title">
-        <h3>Quick Trade</h3>
-        <span id="loggedUser">@guest</span>
-    </div>
+    </section>
 
-    <div class="trade-grid">
 
-        <div class="trade-side">
-            <div class="trade-header">
-                <div class="trade-user">
-                    <div class="avatar">👤</div>
-                    <strong>Your Offer</strong>
-                </div>
-            </div>
+    <!-- TRADES -->
 
-            <div id="yourItems" class="trade-items"></div>
+    <section id="tradesPage" class="page">
 
-            <div class="controls">
-                <select id="yourSelect"></select>
-                <input id="yourQty" type="number" min="1" value="1">
-                <button class="add" onclick="addItem('your')">ADD</button>
-            </div>
+      <div class="card">
+
+        <h2>Trade Calculator</h2>
+
+        <p class="muted">
+          Prices automatically change during school hours.
+        </p>
+
+        <br>
+
+        <div class="trade-grid">
+
+          <div class="trade-side">
+
+            <h3>Your Offer</h3>
+
+            <select id="yourItem"></select>
+
+            <input
+              id="yourQuantity"
+              class="quantity"
+              type="number"
+              min="1"
+              value="1"
+            >
+
+            <button
+              class="secondary"
+              onclick="addTradeItem('your')"
+            >
+              + Add
+            </button>
+
+            <div id="yourItems"></div>
 
             <div class="trade-total">
-                <span>Total</span>
-                <span id="yourTotal">£0.00</span>
-            </div>
-        </div>
-
-
-        <div class="trade-side">
-            <div class="trade-header">
-                <div class="trade-user">
-                    <div class="avatar">👤</div>
-                    <strong>Their Offer</strong>
-                </div>
+              £<span id="yourTotal">0.00</span>
             </div>
 
-            <div id="theirItems" class="trade-items"></div>
+          </div>
 
-            <div class="controls">
-                <select id="theirSelect"></select>
-                <input id="theirQty" type="number" min="1" value="1">
-                <button class="add" onclick="addItem('their')">ADD</button>
-            </div>
+
+          <div class="trade-side">
+
+            <h3>Their Offer</h3>
+
+            <select id="theirItem"></select>
+
+            <input
+              id="theirQuantity"
+              class="quantity"
+              type="number"
+              min="1"
+              value="1"
+            >
+
+            <button
+              class="secondary"
+              onclick="addTradeItem('their')"
+            >
+              + Add
+            </button>
+
+            <div id="theirItems"></div>
 
             <div class="trade-total">
-                <span>Total</span>
-                <span id="theirTotal">£0.00</span>
+              £<span id="theirTotal">0.00</span>
             </div>
+
+          </div>
+
         </div>
 
-    </div>
-</div>
-
-<div class="card result">
-    <div class="result-main" id="resultText">⚖️ Add some items</div>
-    <div class="result-sub" id="difference">Create an offer to compare values.</div>
-
-    <div class="meter">
-        <div class="meter-fill" id="meter"></div>
-    </div>
-</div>
-
-<div class="card values">
-    <div class="section-title">
-        <h3>Item Values</h3>
-        <span>Live pricing</span>
-    </div>
-
-    <div id="valuesList"></div>
-</div>
-
-</section>
-
-<!-- TRADES -->
-
-<section id="tradesPage" class="page">
-
-<div class="hero">
-    <div class="status">
-        <span class="status-dot"></span>
-        Trading
-    </div>
-
-    <h2>Your<br><span>Trades.</span></h2>
-    <p>Send and receive offers from people you've connected with.</p>
-</div>
-
-<div class="card">
-    <div class="section-title">
-        <h3>Incoming Offers</h3>
-        <span>0 pending</span>
-    </div>
-
-    <div class="empty">
-        🔄<br>
-        No trade offers yet.
-    </div>
-</div>
-
-<br>
-
-<div class="card">
-    <div class="section-title">
-        <h3>Trade History</h3>
-    </div>
-
-    <div class="empty">
-        📦<br>
-        Your completed trades will appear here.
-    </div>
-</div>
-
-</section>
-
-<!-- FRIENDS -->
-
-<section id="friendsPage" class="page">
-
-<div class="hero">
-    <div class="status">
-        <span class="status-dot"></span>
-        Social
-    </div>
-
-    <h2>Your<br><span>Friends.</span></h2>
-    <p>Find people and connect with other traders.</p>
-</div>
-
-<div class="card">
-
-    <div class="search">
-        <input id="friendSearch" placeholder="Search username...">
-        <button class="add" onclick="searchUser()">SEARCH</button>
-    </div>
-
-    <div id="friendResults" class="empty">
-        🔎<br>
-        Search for a username.
-    </div>
-
-</div>
-
-<br>
-
-<div class="card">
-
-    <div class="section-title">
-        <h3>Friends</h3>
-        <span id="friendCount">0</span>
-    </div>
-
-    <div class="empty">
-        👥<br>
-        Your friends will appear here.
-    </div>
-
-</div>
-
-</section>
-
-<!-- PROFILE -->
-
-<section id="profilePage" class="page">
-
-<div class="hero">
-    <div class="status">
-        <span class="status-dot"></span>
-        Account
-    </div>
-
-    <h2>Your<br><span>Profile.</span></h2>
-</div>
-
-<div class="card profile">
-
-    <div class="profile-avatar">👤</div>
-
-    <h2 id="profileUsername">@guest</h2>
-    <p style="color:#777;margin-top:6px" id="profileEmail"></p>
-
-    <div class="stats">
-        <div class="stat">
-            <strong>0</strong>
-            <small>Trades</small>
+        <div id="tradeResult" class="trade-result">
+          Add items to calculate the trade.
         </div>
 
-        <div class="stat">
-            <strong>0</strong>
-            <small>Friends</small>
+      </div>
+
+
+      <div class="card">
+
+        <h3>Send This Trade</h3>
+
+        <select id="tradeFriend">
+          <option value="">Select a friend</option>
+        </select>
+
+        <button class="primary" onclick="sendTrade()">
+          Send Trade Offer
+        </button>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2>Incoming Offers</h2>
+
+        <div id="incomingOffers">
+          <p class="muted">Loading...</p>
         </div>
 
-        <div class="stat">
-            <strong>£0</strong>
-            <small>Traded</small>
+      </div>
+
+
+      <div class="card">
+
+        <h2>Values</h2>
+
+        <div id="valuesList"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- FRIENDS -->
+
+    <section id="friendsPage" class="page">
+
+      <div class="card">
+
+        <h2>Find Friends</h2>
+
+        <input
+          id="friendSearch"
+          type="text"
+          placeholder="Search username..."
+          maxlength="20"
+        >
+
+        <button class="primary" onclick="searchUser()">
+          Search
+        </button>
+
+        <div id="friendResults"></div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2>Friend Requests</h2>
+
+        <div id="friendRequests">
+          <p class="muted">Loading...</p>
         </div>
-    </div>
 
-    <br>
+      </div>
 
-    <button class="secondary" onclick="signOut()">
-        Sign out
+
+      <div class="card">
+
+        <h2>Your Friends</h2>
+
+        <div id="friendsList">
+          <p class="muted">Loading...</p>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PROFILE -->
+
+    <section id="profilePage" class="page">
+
+      <div class="card">
+
+        <h2>Your Profile</h2>
+
+        <p class="muted">Username</p>
+
+        <h2 id="profileUsername">
+          -
+        </h2>
+
+        <br>
+
+        <p class="muted">
+          Account ID
+        </p>
+
+        <p id="profileId" style="word-break:break-all">
+          -
+        </p>
+
+      </div>
+
+      <div class="card">
+
+        <h3>Account</h3>
+
+        <button class="danger" onclick="logout()">
+          Log Out
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- NAV -->
+
+  <nav class="bottom-nav">
+
+    <button
+      class="nav-btn active"
+      id="nav-home"
+      onclick="openPage('home')"
+    >
+      <span>⌂</span>
+      Home
     </button>
 
-</div>
+    <button
+      class="nav-btn"
+      id="nav-trades"
+      onclick="openPage('trades')"
+    >
+      <span>⇄</span>
+      Trades
+    </button>
+
+    <button
+      class="nav-btn"
+      id="nav-friends"
+      onclick="openPage('friends')"
+    >
+      <span>♟</span>
+      Friends
+    </button>
+
+    <button
+      class="nav-btn"
+      id="nav-profile"
+      onclick="openPage('profile')"
+    >
+      <span>●</span>
+      Profile
+    </button>
+
+  </nav>
 
 </section>
 
-</div>
 
-<!-- BOTTOM NAV -->
+<div id="toast"></div>
 
-<nav class="bottom-nav" id="bottomNav" style="display:none">
-
-<button class="nav-btn active" onclick="showPage('home')">
-    <span>🏠</span>
-    Home
-</button>
-
-<button class="nav-btn" onclick="showPage('trades')">
-    <span>🔄</span>
-    Trades
-</button>
-
-<button class="nav-btn" onclick="showPage('friends')">
-    <span>👥</span>
-    Friends
-</button>
-
-<button class="nav-btn" onclick="showPage('profile')">
-    <span>👤</span>
-    Profile
-</button>
-
-</nav>
 
 <script>
 
 /* =========================================================
    SUPABASE
-   ========================================================= */
+========================================================= */
 
 const SUPABASE_URL =
-    "https://spxudcbtorqlmvuqvehu.supabase.co";
+  "https://spxudcbtorqlmvuqvehu.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_ZCLNaK7Z14mnPuhbbaGmIg_0X9kP48I";
+  "sb_publishable_ZCLNaK7Z14mnPuhbbaGmIg_0X9kP48I";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 
 /* =========================================================
-   ITEM DATA
-   ========================================================= */
+   ITEM VALUES
+========================================================= */
 
-const items = {
+const ITEMS = {
+  "Radnor Fizz": {
+    school: 1.20,
+    outside: 1.00
+  },
 
-    "Radnor Fizz":{
-        icon:"🥤",
-        school:1.20,
-        outside:1.00
-    },
+  "Sausage Rolls": {
+    school: 2.90,
+    outside: 1.50
+  },
 
-    "Sausage Rolls":{
-        icon:"🌭",
-        school:2.90,
-        outside:1.50
-    },
+  "Mini Doughnuts": {
+    school: 1.20,
+    outside: 2.00
+  },
 
-    "Mini Doughnuts":{
-        icon:"🍩",
-        school:1.20,
-        outside:2.00
-    },
+  "Radnor Splash": {
+    school: 2.00,
+    outside: 1.50
+  },
 
-    "Radnor Splash":{
-        icon:"🧃",
-        school:2.00,
-        outside:1.50
-    },
+  "Radnor Fruits": {
+    school: 1.00,
+    outside: 0.50
+  },
 
-    "Radnor Fruits":{
-        icon:"🍓",
-        school:1.00,
-        outside:.50
-    },
+  "Milkshakes": {
+    school: 1.50,
+    outside: 2.00
+  },
 
-    "Milkshakes":{
-        icon:"🥤",
-        school:1.50,
-        outside:2.00
-    },
+  "50p 2 litre Coke bottle": {
+    school: 1.00,
+    outside: 0.70
+  },
 
-    "50p 2 litre Coke bottle":{
-        icon:"🥤",
-        school:1.00,
-        outside:.70
-    },
-
-    "Popcorn":{
-        icon:"🍿",
-        school:1.10,
-        outside:1.00
-    }
+  "Popcorn": {
+    school: 1.10,
+    outside: 1.00
+  }
 };
+
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let currentUser = null;
 
 let yourOffer = [];
 let theirOffer = [];
 
-let signupMode = false;
+let friends = [];
+let incomingRequests = [];
+let incomingTrades = [];
 
 
 /* =========================================================
-   SCHOOL PRICE
-   ========================================================= */
+   HELPERS
+========================================================= */
 
-function inSchool(){
+function showToast(message) {
 
-    const now = new Date();
-    const day = now.getDay();
+  const toast =
+    document.getElementById("toast");
 
-    if(day === 0 || day === 6)
-        return false;
+  toast.textContent = message;
+  toast.style.display = "block";
 
-    const minutes =
-        now.getHours()*60 +
-        now.getMinutes();
-
-    return minutes >= 510 && minutes <= 930;
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
 }
 
-function price(name){
 
-    return inSchool()
-        ? items[name].school
-        : items[name].outside;
+function escapeHTML(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+
+function isSchoolTime() {
+
+  const now = new Date();
+  const day = now.getDay();
+
+  if (day === 0 || day === 6)
+    return false;
+
+  const minutes =
+    now.getHours() * 60 +
+    now.getMinutes();
+
+  return minutes >= 8 * 60 + 30 &&
+         minutes <= 15 * 60 + 30;
+}
+
+
+function getValue(item) {
+
+  return isSchoolTime()
+    ? ITEMS[item].school
+    : ITEMS[item].outside;
+}
+
+
+function currentPriceLabel() {
+
+  return isSchoolTime()
+    ? "School price"
+    : "Outside-school price";
 }
 
 
 /* =========================================================
-   TRADE CALCULATOR
-   ========================================================= */
+   AUTH UI
+========================================================= */
 
-function populateSelects(){
+function showAuth(type) {
 
-    const options =
-        Object.keys(items)
-        .map(name =>
-            `<option value="${name}">
-                ${items[name].icon} ${name}
-            </option>`
-        )
-        .join("");
+  const login =
+    document.getElementById("loginForm");
 
-    document.getElementById("yourSelect").innerHTML =
-        options;
+  const signup =
+    document.getElementById("signupForm");
 
-    document.getElementById("theirSelect").innerHTML =
-        options;
+  const loginTab =
+    document.getElementById("loginTab");
+
+  const signupTab =
+    document.getElementById("signupTab");
+
+  if (type === "login") {
+
+    login.classList.remove("hidden");
+    signup.classList.add("hidden");
+
+    loginTab.classList.add("active");
+    signupTab.classList.remove("active");
+
+  } else {
+
+    login.classList.add("hidden");
+    signup.classList.remove("hidden");
+
+    loginTab.classList.remove("active");
+    signupTab.classList.add("active");
+
+  }
 }
 
 
-function addItem(side){
+/* =========================================================
+   SIGN UP
+========================================================= */
 
-    const select =
-        document.getElementById(side+"Select");
+async function signup() {
 
-    const qtyInput =
-        document.getElementById(side+"Qty");
+  const username =
+    document
+      .getElementById("signupUsername")
+      .value
+      .trim();
 
-    const name = select.value;
+  const email =
+    document
+      .getElementById("signupEmail")
+      .value
+      .trim();
 
-    const qty =
-        Math.max(1,parseInt(qtyInput.value)||1);
+  const password =
+    document
+      .getElementById("signupPassword")
+      .value;
 
-    const target =
+  if (!username || !email || !password) {
+    showToast("Fill in everything");
+    return;
+  }
+
+  if (username.length < 3) {
+    showToast("Username needs 3+ characters");
+    return;
+  }
+
+  const { data, error } =
+    await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username
+        }
+      }
+    });
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast(
+    "Account created! Check your email if confirmation is enabled."
+  );
+
+  if (data.session) {
+    await loadUser();
+  }
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function login() {
+
+  const email =
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("loginPassword")
+      .value;
+
+  if (!email || !password) {
+    showToast("Enter your email and password");
+    return;
+  }
+
+  const { error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  await loadUser();
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function logout() {
+
+  await supabaseClient.auth.signOut();
+
+  currentUser = null;
+
+  document
+    .getElementById("appScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("authScreen")
+    .classList.remove("hidden");
+
+  showToast("Logged out");
+}
+
+
+/* =========================================================
+   LOAD USER
+========================================================= */
+
+async function loadUser() {
+
+  const {
+    data: {
+      user
+    }
+  } = await supabaseClient.auth.getUser();
+
+  if (!user) return;
+
+  currentUser = user;
+
+  document
+    .getElementById("authScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("appScreen")
+    .classList.remove("hidden");
+
+  await loadProfile();
+  await loadFriends();
+  await loadRequests();
+  await loadTrades();
+
+  setupRealtime();
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+async function loadProfile() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("profile")
+    .select("*")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const username =
+    data?.username ||
+    currentUser.user_metadata?.username ||
+    currentUser.email?.split("@")[0] ||
+    "User";
+
+  document
+    .getElementById("welcomeText")
+    .textContent =
+      `Welcome, ${username} 👋`;
+
+  document
+    .getElementById("profileUsername")
+    .textContent =
+      username;
+
+  document
+    .getElementById("profileId")
+    .textContent =
+      currentUser.id;
+}
+
+
+/* =========================================================
+   PAGE NAVIGATION
+========================================================= */
+
+function openPage(page) {
+
+  document
+    .querySelectorAll(".page")
+    .forEach(el => {
+      el.classList.remove("active");
+    });
+
+  document
+    .getElementById(page + "Page")
+    .classList.add("active");
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(el => {
+      el.classList.remove("active");
+    });
+
+  const nav =
+    document.getElementById("nav-" + page);
+
+  if (nav) {
+    nav.classList.add("active");
+  }
+
+  if (page === "friends") {
+    loadFriends();
+    loadRequests();
+  }
+
+  if (page === "trades") {
+    loadTrades();
+  }
+}
+
+
+/* =========================================================
+   TRADE CALCULATOR SETUP
+========================================================= */
+
+function setupCalculator() {
+
+  const your =
+    document.getElementById("yourItem");
+
+  const their =
+    document.getElementById("theirItem");
+
+  your.innerHTML = "";
+  their.innerHTML = "";
+
+  Object.keys(ITEMS).forEach(item => {
+
+    const option1 =
+      document.createElement("option");
+
+    option1.value = item;
+    option1.textContent =
+      `${item} — £${getValue(item).toFixed(2)}`;
+
+    your.appendChild(option1);
+
+    const option2 =
+      document.createElement("option");
+
+    option2.value = item;
+    option2.textContent =
+      `${item} — £${getValue(item).toFixed(2)}`;
+
+    their.appendChild(option2);
+
+  });
+
+  renderValues();
+}
+
+
+/* =========================================================
+   ADD TRADE ITEM
+========================================================= */
+
+function addTradeItem(side) {
+
+  const item =
+    document.getElementById(
+      side === "your"
+        ? "yourItem"
+        : "theirItem"
+    ).value;
+
+  const quantity =
+    parseInt(
+      document.getElementById(
         side === "your"
-        ? yourOffer
-        : theirOffer;
-
-    const existing =
-        target.find(x => x.name === name);
-
-    if(existing)
-        existing.qty += qty;
-    else
-        target.push({name,qty});
-
-    renderOffers();
-}
-
-
-function removeItem(side,index){
-
-    if(side === "your")
-        yourOffer.splice(index,1);
-    else
-        theirOffer.splice(index,1);
-
-    renderOffers();
-}
-
-
-function renderOffers(){
-
-    renderSide(
-        "your",
-        yourOffer
+          ? "yourQuantity"
+          : "theirQuantity"
+      ).value
     );
 
-    renderSide(
-        "their",
-        theirOffer
+  if (!quantity || quantity < 1) {
+    showToast("Enter a valid quantity");
+    return;
+  }
+
+  const target =
+    side === "your"
+      ? yourOffer
+      : theirOffer;
+
+  const existing =
+    target.find(x => x.item === item);
+
+  if (existing) {
+    existing.quantity += quantity;
+  } else {
+    target.push({
+      item,
+      quantity
+    });
+  }
+
+  renderTrade();
+}
+
+
+/* =========================================================
+   REMOVE TRADE ITEM
+========================================================= */
+
+function removeTradeItem(side, index) {
+
+  if (side === "your") {
+    yourOffer.splice(index, 1);
+  } else {
+    theirOffer.splice(index, 1);
+  }
+
+  renderTrade();
+}
+
+
+/* =========================================================
+   RENDER TRADE
+========================================================= */
+
+function renderTrade() {
+
+  renderSide("your");
+  renderSide("their");
+
+  const yourTotal =
+    calculateTotal(yourOffer);
+
+  const theirTotal =
+    calculateTotal(theirOffer);
+
+  document
+    .getElementById("yourTotal")
+    .textContent =
+      yourTotal.toFixed(2);
+
+  document
+    .getElementById("theirTotal")
+    .textContent =
+      theirTotal.toFixed(2);
+
+  const difference =
+    Math.abs(yourTotal - theirTotal);
+
+  const result =
+    document.getElementById("tradeResult");
+
+  if (!yourOffer.length && !theirOffer.length) {
+
+    result.textContent =
+      "Add items to calculate the trade.";
+
+    return;
+  }
+
+  if (difference < 0.25) {
+
+    result.textContent =
+      "🔥 VERY CLOSE TRADE";
+
+  } else if (yourTotal > theirTotal) {
+
+    result.textContent =
+      `Your offer is worth £${difference.toFixed(2)} more`;
+
+  } else {
+
+    result.textContent =
+      `Their offer is worth £${difference.toFixed(2)} more`;
+
+  }
+}
+
+
+function renderSide(side) {
+
+  const list =
+    side === "your"
+      ? yourOffer
+      : theirOffer;
+
+  const container =
+    document.getElementById(
+      side === "your"
+        ? "yourItems"
+        : "theirItems"
     );
 
-    updateResult();
+  container.innerHTML = "";
+
+  list.forEach((entry, index) => {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "item-row";
+
+    div.innerHTML = `
+      <div>
+        <strong>${escapeHTML(entry.item)}</strong>
+        <small>
+          £${getValue(entry.item).toFixed(2)}
+          × ${entry.quantity}
+        </small>
+      </div>
+
+      <button
+        class="remove"
+        onclick="removeTradeItem('${side}', ${index})"
+      >
+        ×
+      </button>
+    `;
+
+    container.appendChild(div);
+
+  });
 }
 
 
-function renderSide(side,list){
+function calculateTotal(offer) {
 
-    const container =
-        document.getElementById(side+"Items");
-
-    if(!list.length){
-
-        container.innerHTML = `
-            <div class="empty">
-                Nothing added yet.
-            </div>
-        `;
-
-        document.getElementById(side+"Total")
-            .textContent = "£0.00";
-
-        return;
-    }
-
-    let total = 0;
-
-    container.innerHTML =
-        list.map((item,index)=>{
-
-            const p = price(item.name);
-            const value = p * item.qty;
-
-            total += value;
-
-            return `
-                <div class="item">
-
-                    <div class="item-icon">
-                        ${items[item.name].icon}
-                    </div>
-
-                    <div class="item-info">
-                        <strong>${item.name}</strong>
-                        <small>
-                            ×${item.qty} · £${p.toFixed(2)} each
-                        </small>
-                    </div>
-
-                    <div class="item-price">
-                        £${value.toFixed(2)}
-                    </div>
-
-                    <button
-                        class="remove"
-                        onclick="removeItem('${side}',${index})">
-                        ×
-                    </button>
-
-                </div>
-            `;
-
-        }).join("");
-
-    document.getElementById(side+"Total")
-        .textContent =
-        "£"+total.toFixed(2);
-}
-
-
-function getTotal(list){
-
-    return list.reduce(
-        (sum,item)=>
-            sum + price(item.name)*item.qty,
-        0
-    );
-}
-
-
-function updateResult(){
-
-    const a = getTotal(yourOffer);
-    const b = getTotal(theirOffer);
-
-    const diff = Math.abs(a-b);
-
-    const result =
-        document.getElementById("resultText");
-
-    const difference =
-        document.getElementById("difference");
-
-    const meter =
-        document.getElementById("meter");
-
-    if(a === 0 && b === 0){
-
-        result.textContent =
-            "⚖️ Add some items";
-
-        difference.textContent =
-            "Create an offer to compare values.";
-
-        meter.style.width = "50%";
-
-        return;
-    }
-
-    difference.textContent =
-        "Difference: £"+diff.toFixed(2);
-
-    if(diff < .25){
-
-        result.textContent =
-            "⚖️ VERY CLOSE TRADE";
-
-    }else if(a > b){
-
-        result.textContent =
-            "📈 YOUR OFFER IS WORTH MORE";
-
-    }else{
-
-        result.textContent =
-            "📈 THEIR OFFER IS WORTH MORE";
-    }
-
-    const total = a+b;
-
-    let percentage =
-        total === 0
-        ? 50
-        : (a/total)*100;
-
-    meter.style.width =
-        percentage+"%";
+  return offer.reduce(
+    (total, entry) =>
+      total +
+      getValue(entry.item) *
+      entry.quantity,
+    0
+  );
 }
 
 
 /* =========================================================
    VALUES
-   ========================================================= */
+========================================================= */
 
-function renderValues(){
+function renderValues() {
 
-    const school = inSchool();
+  const container =
+    document.getElementById("valuesList");
 
-    document.getElementById("valuesList").innerHTML =
-        Object.entries(items)
-        .map(([name,item])=>{
+  container.innerHTML =
+    `<p class="muted">${currentPriceLabel()}</p>`;
 
-            return `
-                <div class="value-row">
+  Object.entries(ITEMS).forEach(
+    ([name, values]) => {
 
-                    <div class="value-icon">
-                        ${item.icon}
-                    </div>
+      const div =
+        document.createElement("div");
 
-                    <div class="value-name">
-                        <strong>${name}</strong>
-                        <small>
-                            ${school ? "School price" : "Outside price"}
-                        </small>
-                    </div>
+      div.className = "item-row";
 
-                    <div class="value-number">
-                        <strong>
-                            £${price(name).toFixed(2)}
-                        </strong>
-                        <small>
-                            ${school
-                                ? "£"+item.outside.toFixed(2)+" outside"
-                                : "£"+item.school.toFixed(2)+" school"}
-                        </small>
-                    </div>
+      div.innerHTML = `
+        <div>
+          <strong>${escapeHTML(name)}</strong>
+        </div>
 
-                </div>
-            `;
+        <strong>
+          £${getValue(name).toFixed(2)}
+        </strong>
+      `;
 
-        }).join("");
-}
+      container.appendChild(div);
 
-
-/* =========================================================
-   NAVIGATION
-   ========================================================= */
-
-function showPage(name){
-
-    document
-        .querySelectorAll(".page")
-        .forEach(p=>p.classList.remove("active"));
-
-    const page =
-        document.getElementById(name+"Page");
-
-    if(page)
-        page.classList.add("active");
-
-    document
-        .querySelectorAll(".nav-btn")
-        .forEach(btn=>btn.classList.remove("active"));
-
-    const buttons =
-        document.querySelectorAll(".nav-btn");
-
-    const index = {
-        home:0,
-        trades:1,
-        friends:2,
-        profile:3
-    };
-
-    if(index[name] !== undefined)
-        buttons[index[name]].classList.add("active");
-}
-
-
-/* =========================================================
-   AUTH
-   ========================================================= */
-
-function toggleAuth(){
-
-    signupMode = !signupMode;
-
-    document.getElementById("authTitle")
-        .textContent =
-        signupMode
-        ? "Create account"
-        : "Welcome back";
-
-    document.getElementById("authSubtitle")
-        .textContent =
-        signupMode
-        ? "Create your Carr Hill Trading account"
-        : "Sign in to Carr Hill Trading";
-
-    document.getElementById("usernameField")
-        .style.display =
-        signupMode ? "block" : "none";
-
-    document.getElementById("authButton")
-        .textContent =
-        signupMode ? "Create account" : "Sign in";
-
-    document.getElementById("authToggle")
-        .textContent =
-        signupMode
-        ? "Already have an account? Sign in"
-        : "Need an account? Sign up";
-}
-
-
-async function submitAuth(){
-
-    const email =
-        document.getElementById("email").value.trim();
-
-    const password =
-        document.getElementById("password").value;
-
-    if(!email || !password){
-
-        toast("Enter your email and password.");
-
-        return;
     }
-
-    try{
-
-        if(signupMode){
-
-            const username =
-                document.getElementById("username")
-                .value.trim()
-                .toLowerCase();
-
-            if(!username){
-
-                toast("Choose a username.");
-
-                return;
-            }
-
-            const {data,error} =
-                await supabaseClient.auth.signUp({
-                    email,
-                    password,
-                    options:{
-                        data:{
-                            username
-                        }
-                    }
-                });
-
-            if(error) throw error;
-
-            toast(
-                "Account created! Check your email if confirmation is required."
-            );
-
-        }else{
-
-            const {data,error} =
-                await supabaseClient.auth.signInWithPassword({
-                    email,
-                    password
-                });
-
-            if(error) throw error;
-
-            toast("Logged in!");
-
-            loadUser(data.user);
-        }
-
-    }catch(error){
-
-        console.error(error);
-
-        toast(error.message);
-    }
-}
-
-
-/* =========================================================
-   USER
-   ========================================================= */
-
-async function loadUser(user){
-
-    if(!user) return;
-
-    const username =
-        user.user_metadata?.username ||
-        user.email?.split("@")[0] ||
-        "user";
-
-    document.getElementById("loggedUser")
-        .textContent =
-        "@"+username;
-
-    document.getElementById("profileUsername")
-        .textContent =
-        "@"+username;
-
-    document.getElementById("profileEmail")
-        .textContent =
-        user.email || "";
-
-    document.getElementById("authPage")
-        .classList.remove("active");
-
-    document.getElementById("bottomNav")
-        .style.display = "grid";
-
-    showPage("home");
-}
-
-
-async function signOut(){
-
-    await supabaseClient.auth.signOut();
-
-    document.getElementById("bottomNav")
-        .style.display = "none";
-
-    document
-        .querySelectorAll(".page")
-        .forEach(p=>p.classList.remove("active"));
-
-    document
-        .getElementById("authPage")
-        .classList.add("active");
-
-    toast("Signed out.");
+  );
 }
 
 
 /* =========================================================
    FRIEND SEARCH
-   ========================================================= */
+========================================================= */
 
-async function searchUser(){
+async function searchUser() {
 
-    const username =
-        document.getElementById("friendSearch")
-        .value.trim()
-        .toLowerCase();
+  const username =
+    document
+      .getElementById("friendSearch")
+      .value
+      .trim();
 
-    const results =
-        document.getElementById("friendResults");
+  if (!username) {
+    showToast("Enter a username");
+    return;
+  }
 
-    if(!username){
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("profile")
+    .select("id, username, avatar_url")
+    .ilike("username", `%${username}%`)
+    .neq("id", currentUser.id)
+    .limit(10);
 
-        results.innerHTML =
-            "🔎<br>Enter a username.";
+  if (error) {
+    console.error(error);
+    showToast("Search failed");
+    return;
+  }
 
-        return;
-    }
+  const results =
+    document.getElementById("friendResults");
+
+  if (!data.length) {
 
     results.innerHTML =
-        "Searching...";
+      `<p class="muted">No users found.</p>`;
 
-    /*
-       Friend database connection will be added
-       after the friends table is created in Supabase.
-    */
+    return;
+  }
 
-    results.innerHTML = `
-        🔎<br>
-        <strong>@${username}</strong><br>
-        <small style="color:#777">
-            Friend search is ready for the database.
-        </small>
-    `;
+  results.innerHTML =
+    data.map(user => `
+
+      <div class="friend-result">
+
+        <div>
+          <div class="username">
+            ${escapeHTML(user.username)}
+          </div>
+        </div>
+
+        <button
+          class="secondary"
+          onclick="sendFriendRequest('${user.id}')"
+        >
+          Add Friend
+        </button>
+
+      </div>
+
+    `).join("");
 }
 
 
 /* =========================================================
-   TOAST
-   ========================================================= */
+   SEND FRIEND REQUEST
+========================================================= */
 
-let toastTimer;
+async function sendFriendRequest(friendId) {
 
-function toast(message){
+  if (friendId === currentUser.id) {
+    showToast("You can't add yourself");
+    return;
+  }
 
-    const box =
-        document.getElementById("toast");
+  const {
+    data: existing
+  } = await supabaseClient
+    .from("friends")
+    .select("*")
+    .or(
+      `and(user_id.eq.${currentUser.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${currentUser.id})`
+    )
+    .maybeSingle();
 
-    box.textContent = message;
+  if (existing) {
 
-    box.classList.add("show");
+    showToast(
+      existing.status === "accepted"
+        ? "Already friends"
+        : "Request already exists"
+    );
 
-    clearTimeout(toastTimer);
+    return;
+  }
 
-    toastTimer =
-        setTimeout(()=>{
-            box.classList.remove("show");
-        },3000);
+  const {
+    error
+  } = await supabaseClient
+    .from("friends")
+    .insert({
+      user_id: currentUser.id,
+      friend_id: friendId,
+      status: "pending"
+    });
+
+  if (error) {
+
+    console.error(error);
+    showToast("Couldn't send request");
+    return;
+
+  }
+
+  showToast("Friend request sent!");
+
+  loadRequests();
+}
+
+
+/* =========================================================
+   LOAD FRIENDS
+========================================================= */
+
+async function loadFriends() {
+
+  if (!currentUser) return;
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("friends")
+    .select("*")
+    .eq("status", "accepted")
+    .or(
+      `user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`
+    );
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const friendIds =
+    data.map(row =>
+      row.user_id === currentUser.id
+        ? row.friend_id
+        : row.user_id
+    );
+
+  friends = [];
+
+  if (friendIds.length) {
+
+    const {
+      data: profiles
+    } = await supabaseClient
+      .from("profile")
+      .select("id, username")
+      .in("id", friendIds);
+
+    friends = profiles || [];
+  }
+
+  renderFriends();
+  populateTradeFriends();
+}
+
+
+/* =========================================================
+   RENDER FRIENDS
+========================================================= */
+
+function renderFriends() {
+
+  const container =
+    document.getElementById("friendsList");
+
+  document
+    .getElementById("friendCount")
+    .textContent =
+      friends.length;
+
+  if (!friends.length) {
+
+    container.innerHTML =
+      `<p class="muted">
+        No friends yet.
+      </p>`;
+
+    return;
+  }
+
+  container.innerHTML =
+    friends.map(friend => `
+
+      <div class="friend-card">
+
+        <div>
+          <div class="username">
+            ${escapeHTML(friend.username)}
+          </div>
+
+          <div class="user-id">
+            Online account
+          </div>
+        </div>
+
+        <button
+          class="secondary"
+          onclick="tradeWith('${friend.id}')"
+        >
+          Trade
+        </button>
+
+      </div>
+
+    `).join("");
+}
+
+
+/* =========================================================
+   FRIEND REQUESTS
+========================================================= */
+
+async function loadRequests() {
+
+  if (!currentUser) return;
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("friends")
+    .select("*")
+    .eq("friend_id", currentUser.id)
+    .eq("status", "pending");
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  incomingRequests = data || [];
+
+  document
+    .getElementById("pendingCount")
+    .textContent =
+      incomingRequests.length;
+
+  const container =
+    document.getElementById("friendRequests");
+
+  if (!incomingRequests.length) {
+
+    container.innerHTML =
+      `<p class="muted">
+        No pending requests.
+      </p>`;
+
+    return;
+  }
+
+  const ids =
+    incomingRequests.map(x => x.user_id);
+
+  const {
+    data: profiles
+  } = await supabaseClient
+    .from("profile")
+    .select("id, username")
+    .in("id", ids);
+
+  const profileMap = {};
+
+  (profiles || []).forEach(p => {
+    profileMap[p.id] = p;
+  });
+
+  container.innerHTML =
+    incomingRequests.map(request => {
+
+      const user =
+        profileMap[request.user_id];
+
+      return `
+
+        <div class="request-card">
+
+          <div>
+            <div class="username">
+              ${escapeHTML(
+                user?.username || "Unknown user"
+              )}
+            </div>
+          </div>
+
+          <div class="button-row">
+
+            <button
+              class="secondary"
+              onclick="acceptFriend('${request.id}')"
+            >
+              Accept
+            </button>
+
+            <button
+              class="danger"
+              onclick="declineFriend('${request.id}')"
+            >
+              Decline
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+}
+
+
+/* =========================================================
+   ACCEPT FRIEND
+========================================================= */
+
+async function acceptFriend(id) {
+
+  const {
+    error
+  } = await supabaseClient
+    .from("friends")
+    .update({
+      status: "accepted"
+    })
+    .eq("id", id)
+    .eq("friend_id", currentUser.id);
+
+  if (error) {
+
+    console.error(error);
+    showToast("Couldn't accept request");
+    return;
+
+  }
+
+  showToast("Friend added!");
+
+  await loadFriends();
+  await loadRequests();
+}
+
+
+/* =========================================================
+   DECLINE FRIEND
+========================================================= */
+
+async function declineFriend(id) {
+
+  const {
+    error
+  } = await supabaseClient
+    .from("friends")
+    .delete()
+    .eq("id", id)
+    .eq("friend_id", currentUser.id);
+
+  if (error) {
+
+    console.error(error);
+    showToast("Couldn't decline request");
+    return;
+
+  }
+
+  await loadRequests();
+
+  showToast("Request declined");
+}
+
+
+/* =========================================================
+   TRADE WITH FRIEND
+========================================================= */
+
+function tradeWith(friendId) {
+
+  openPage("trades");
+
+  const select =
+    document.getElementById("tradeFriend");
+
+  select.value = friendId;
+
+  showToast("Friend selected for trading");
+}
+
+
+/* =========================================================
+   FRIEND DROPDOWN
+========================================================= */
+
+function populateTradeFriends() {
+
+  const select =
+    document.getElementById("tradeFriend");
+
+  select.innerHTML =
+    `<option value="">Select a friend</option>`;
+
+  friends.forEach(friend => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = friend.id;
+    option.textContent =
+      friend.username;
+
+    select.appendChild(option);
+
+  });
+}
+
+
+/* =========================================================
+   SEND TRADE
+========================================================= */
+
+async function sendTrade() {
+
+  const receiverId =
+    document.getElementById("tradeFriend").value;
+
+  if (!receiverId) {
+    showToast("Select a friend");
+    return;
+  }
+
+  if (!yourOffer.length && !theirOffer.length) {
+    showToast("Add some items first");
+    return;
+  }
+
+  const {
+    error
+  } = await supabaseClient
+    .from("trades")
+    .insert({
+      sender_id: currentUser.id,
+      receiver_id: receiverId,
+      sender_offer: yourOffer,
+      receiver_offer: theirOffer,
+      status: "pending"
+    });
+
+  if (error) {
+
+    console.error(error);
+    showToast("Couldn't send trade");
+    return;
+
+  }
+
+  showToast("Trade offer sent!");
+
+  yourOffer = [];
+  theirOffer = [];
+
+  renderTrade();
+}
+
+
+/* =========================================================
+   LOAD TRADES
+========================================================= */
+
+async function loadTrades() {
+
+  if (!currentUser) return;
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("trades")
+    .select("*")
+    .eq("receiver_id", currentUser.id)
+    .eq("status", "pending")
+    .order("created_at", {
+      ascending: false
+    });
+
+  if (error) {
+
+    console.error(error);
+    return;
+
+  }
+
+  incomingTrades = data || [];
+
+  document
+    .getElementById("offerCount")
+    .textContent =
+      incomingTrades.length;
+
+  renderIncomingTrades();
+}
+
+
+/* =========================================================
+   RENDER INCOMING TRADES
+========================================================= */
+
+async function renderIncomingTrades() {
+
+  const container =
+    document.getElementById("incomingOffers");
+
+  if (!incomingTrades.length) {
+
+    container.innerHTML =
+      `<p class="muted">
+        No incoming trade offers.
+      </p>`;
+
+    return;
+  }
+
+  const senderIds =
+    incomingTrades.map(t => t.sender_id);
+
+  const {
+    data: profiles
+  } = await supabaseClient
+    .from("profile")
+    .select("id, username")
+    .in("id", senderIds);
+
+  const map = {};
+
+  (profiles || []).forEach(profile => {
+    map[profile.id] = profile;
+  });
+
+  container.innerHTML =
+    incomingTrades.map(trade => {
+
+      const sender =
+        map[trade.sender_id];
+
+      const senderOffer =
+        trade.sender_offer || [];
+
+      const receiverOffer =
+        trade.receiver_offer || [];
+
+      const senderTotal =
+        calculateTotal(senderOffer);
+
+      const receiverTotal =
+        calculateTotal(receiverOffer);
+
+      return `
+
+        <div class="offer-card">
+
+          <div style="width:100%">
+
+            <div class="username">
+              ${escapeHTML(
+                sender?.username || "Unknown"
+              )}
+            </div>
+
+            <br>
+
+            <div>
+              They offer:
+              <strong>
+                £${senderTotal.toFixed(2)}
+              </strong>
+            </div>
+
+            <div>
+              You give:
+              <strong>
+                £${receiverTotal.toFixed(2)}
+              </strong>
+            </div>
+
+            <br>
+
+            <div class="muted">
+              ${formatOffer(senderOffer)}
+            </div>
+
+            <div class="muted">
+              In exchange for:
+              ${formatOffer(receiverOffer)}
+            </div>
+
+            <br>
+
+            <div class="button-row">
+
+              <button
+                class="secondary"
+                onclick="acceptTrade('${trade.id}')"
+              >
+                Accept
+              </button>
+
+              <button
+                class="danger"
+                onclick="declineTrade('${trade.id}')"
+              >
+                Decline
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+}
+
+
+function formatOffer(offer) {
+
+  if (!offer || !offer.length)
+    return "Nothing";
+
+  return offer.map(item =>
+    `${escapeHTML(item.item)} × ${item.quantity}`
+  ).join(", ");
+}
+
+
+/* =========================================================
+   ACCEPT TRADE
+========================================================= */
+
+async function acceptTrade(id) {
+
+  const {
+    error
+  } = await supabaseClient
+    .from("trades")
+    .update({
+      status: "accepted"
+    })
+    .eq("id", id)
+    .eq("receiver_id", currentUser.id);
+
+  if (error) {
+
+    console.error(error);
+    showToast("Couldn't accept trade");
+    return;
+
+  }
+
+  showToast("Trade accepted!");
+
+  await loadTrades();
+}
+
+
+/* =========================================================
+   DECLINE TRADE
+========================================================= */
+
+async function declineTrade(id) {
+
+  const {
+    error
+  } = await supabaseClient
+    .from("trades")
+    .update({
+      status: "declined"
+    })
+    .eq("id", id)
+    .eq("receiver_id", currentUser.id);
+
+  if (error) {
+
+    console.error(error);
+    showToast("Couldn't decline trade");
+    return;
+
+  }
+
+  showToast("Trade declined");
+
+  await loadTrades();
+}
+
+
+/* =========================================================
+   REALTIME
+========================================================= */
+
+function setupRealtime() {
+
+  if (!currentUser) return;
+
+  supabaseClient
+    .channel("carr-hill-live")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "friends"
+      },
+      async () => {
+
+        await loadFriends();
+        await loadRequests();
+
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "trades"
+      },
+      async () => {
+
+        await loadTrades();
+
+      }
+    )
+    .subscribe();
 }
 
 
 /* =========================================================
    STARTUP
-   ========================================================= */
+========================================================= */
 
-populateSelects();
-renderOffers();
-renderValues();
+async function startup() {
 
-setInterval(()=>{
-    renderValues();
-    renderOffers();
-},30000);
+  setupCalculator();
 
+  renderTrade();
 
-/* Check existing login */
+  const {
+    data: {
+      session
+    }
+  } = await supabaseClient.auth.getSession();
 
-supabaseClient.auth
-.getSession()
-.then(({data})=>{
+  if (session) {
+    await loadUser();
+  }
 
-    if(data.session){
+  supabaseClient.auth.onAuthStateChange(
+    async (event, session) => {
 
-        loadUser(data.session.user);
+      if (
+        session &&
+        !currentUser
+      ) {
+        await loadUser();
+      }
 
     }
+  );
+}
 
-});
+
+startup();
 
 
-/* Watch login state */
+/* Refresh prices every 30 seconds */
 
-supabaseClient.auth
-.onAuthStateChange(
-    (event,session)=>{
+setInterval(() => {
 
-        if(session){
+  setupCalculator();
+  renderTrade();
 
-            loadUser(session.user);
-
-        }
-
-    }
-);
+}, 30000);
 
 </script>
 
