@@ -2511,5 +2511,13 @@ setInterval(() => {
 
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+  const bad=[];
+  while(w.nextNode()) if(w.currentNode.nodeValue.includes("\\n")) bad.push(w.currentNode);
+  bad.forEach(n=>n.nodeValue=n.nodeValue.replace(/\\n/g,""));
+});
+</script>
 </body>
 </html>
