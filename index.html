@@ -727,12 +727,11 @@
               value="1"
             >
 
-            <button
-              class="secondary"
-              onclick="addTradeItem('your')"
-            >
-              + Add
-            </button>
+            <button class="secondary" onclick="addTradeItem('your')">+ Add Item</button>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <input id="yourMoney" type="number" min="0.01" step="0.01" placeholder="Cash amount (£)" style="margin:0">
+              <button class="secondary" onclick="addMoney('your')" style="white-space:nowrap">+ Add Money</button>
+            </div>
 
             <div id="yourItems"></div>
 
@@ -757,12 +756,11 @@
               value="1"
             >
 
-            <button
-              class="secondary"
-              onclick="addTradeItem('their')"
-            >
-              + Add
-            </button>
+            <button class="secondary" onclick="addTradeItem('their')">+ Add Item</button>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <input id="theirMoney" type="number" min="0.01" step="0.01" placeholder="Cash amount (£)" style="margin:0">
+              <button class="secondary" onclick="addMoney('their')" style="white-space:nowrap">+ Add Money</button>
+            </div>
 
             <div id="theirItems"></div>
 
@@ -1118,10 +1116,17 @@ const ITEMS = {
     outside: 0.70
   },
 
-  "Popcorn": {
-    school: 1.10,
-    outside: 1.00
-  }
+  "Popcorn": { school: 1.10, outside: 1.00 },
+  "Black Pen": { school: 0.50, outside: 0.30 },
+  "Blue Pen": { school: 0.50, outside: 0.30 },
+  "Red Pen": { school: 0.50, outside: 0.30 },
+  "Pencil": { school: 0.30, outside: 0.20 },
+  "Mechanical Pencil": { school: 1.00, outside: 0.75 },
+  "Rubber / Eraser": { school: 0.40, outside: 0.25 },
+  "Pencil Sharpener": { school: 0.50, outside: 0.35 },
+  "Ruler": { school: 0.60, outside: 0.40 },
+  "Highlighter": { school: 0.75, outside: 0.50 },
+  "Glue Stick": { school: 1.00, outside: 0.75 }
 };
 
 
@@ -1629,6 +1634,18 @@ function addTradeItem(side) {
 }
 
 
+function addMoney(side) {
+  const input=document.getElementById(side==="your"?"yourMoney":"theirMoney");
+  const amount=Math.round(Number(input.value)*100)/100;
+  if(!Number.isFinite(amount)||amount<=0||amount>100){showToast("Enter a cash amount from £0.01 to £100");return;}
+  const target=side==="your"?yourOffer:theirOffer;
+  const existing=target.find(x=>x.type==="money");
+  if(existing) existing.amount=Math.round((existing.amount+amount)*100)/100;
+  else target.push({type:"money",amount});
+  input.value="";
+  renderTrade();
+}
+
 /* =========================================================
    REMOVE TRADE ITEM
 ========================================================= */
@@ -1726,21 +1743,15 @@ function renderSide(side) {
 
     div.className = "item-row";
 
-    div.innerHTML = `
+    div.innerHTML = entry.type === "money" ? `
+      <div><strong>💷 Cash</strong><small>£${Number(entry.amount).toFixed(2)}</small></div>
+      <button class="remove" onclick="removeTradeItem('${side}', ${index})">×</button>
+    ` : `
       <div>
         <strong>${escapeHTML(entry.item)}</strong>
-        <small>
-          £${getValue(entry.item).toFixed(2)}
-          × ${entry.quantity}
-        </small>
+        <small>£${getValue(entry.item).toFixed(2)} × ${entry.quantity}</small>
       </div>
-
-      <button
-        class="remove"
-        onclick="removeTradeItem('${side}', ${index})"
-      >
-        ×
-      </button>
+      <button class="remove" onclick="removeTradeItem('${side}', ${index})">×</button>
     `;
 
     container.appendChild(div);
@@ -1751,13 +1762,10 @@ function renderSide(side) {
 
 function calculateTotal(offer) {
 
-  return offer.reduce(
-    (total, entry) =>
-      total +
-      getValue(entry.item) *
-      entry.quantity,
-    0
-  );
+  return offer.reduce((total, entry) => {
+    if (entry.type === "money") return total + Number(entry.amount || 0);
+    return total + getValue(entry.item) * entry.quantity;
+  }, 0);
 }
 
 
