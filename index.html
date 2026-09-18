@@ -1708,14 +1708,14 @@ async function searchUser() {
     error
   } = await supabaseClient
     .from("profile")
-    .select("id, username, avatar_url")
+    .select("id, username, avatar_url, role")
     .ilike("username", `%${username}%`)
     .neq("id", currentUser.id)
     .limit(10);
 
   if (error) {
     console.error(error);
-    showToast("Search failed");
+    showToast("Search failed: " + error.message);
     return;
   }
 
@@ -1737,7 +1737,7 @@ async function searchUser() {
 
         <div>
           <div class="username">
-            ${escapeHTML(user.username)}
+            ${escapeHTML(user.username || (user.id === DEV_ID ? "ilikebeagles12346" : "Unknown user"))}${roleBadge(user)}
           </div>
         </div>
 
@@ -1855,11 +1855,15 @@ async function loadFriends() {
 
     if (profileError) console.error("Friend profile loading error:", profileError);
     const profileMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
-    friends = friendIds.map(id => profileMap[id] || {
-      id,
-      username: id === DEV_ID ? "ilikebeagles12346" : "Friend",
-      role: id === DEV_ID ? "admin" : "user"
-    });
+    friends = friendIds.map(id => profileMap[id]).filter(Boolean);
+
+    // If a friendship exists but its profile is missing, don't invent a generic
+    // "Friend" label. Keep the ID temporarily and retry profile loading shortly.
+    const missingIds = friendIds.filter(id => !profileMap[id]);
+    if (missingIds.length) {
+      console.warn("Missing profile rows for friends:", missingIds);
+      setTimeout(() => loadFriends(), 2500);
+    }
   }
 
   renderFriends();
