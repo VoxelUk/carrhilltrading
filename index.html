@@ -8,172 +8,226 @@
 <style>
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 body {
+    margin: 0;
     font-family: Arial, sans-serif;
-    background: #090909;
+    background: #0b0b0f;
     color: white;
 }
 
 header {
-    background: linear-gradient(135deg, #8b0000, #300000);
+    background: linear-gradient(135deg, #8b0000, #3d0000);
     padding: 25px;
     text-align: center;
-    border-bottom: 2px solid #ff2020;
+    border-bottom: 3px solid #ff3030;
 }
 
 header h1 {
+    margin: 0;
     font-size: 32px;
 }
 
 header p {
-    color: #ffb0b0;
-    margin-top: 6px;
-}
-
-.balance {
-    margin: 20px auto;
-    max-width: 1000px;
-    background: #151515;
-    border: 1px solid #333;
-    border-radius: 15px;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.money {
-    font-size: 28px;
-    font-weight: bold;
-    color: #55ff88;
-}
-
-.status {
-    padding: 8px 14px;
-    border-radius: 20px;
-    background: #222;
+    margin: 8px 0 0;
+    color: #ddd;
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: auto;
     padding: 20px;
 }
 
-.market {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 20px;
-}
+/* SCHOOL STATUS */
 
-.card {
-    background: #151515;
-    border: 1px solid #333;
-    border-radius: 15px;
-    padding: 20px;
-    transition: 0.2s;
-}
-
-.card:hover {
-    transform: translateY(-3px);
-    border-color: #ff3030;
-}
-
-.item-name {
-    font-size: 22px;
+.status {
+    text-align: center;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 12px;
     font-weight: bold;
+    background: #18181d;
+    border: 1px solid #333;
 }
 
-.price {
-    font-size: 32px;
-    margin: 15px 0 5px;
-}
-
-.change {
-    margin-bottom: 15px;
-}
-
-.up {
+.in-school {
     color: #55ff88;
 }
 
-.down {
+.out-school {
     color: #ff5555;
 }
 
-.holdings {
-    color: #aaa;
-    margin-bottom: 15px;
+/* TRADE */
+
+.trade-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
-button {
-    border: none;
-    border-radius: 8px;
-    padding: 11px 18px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-right: 6px;
+@media (max-width: 700px) {
+    .trade-container {
+        grid-template-columns: 1fr;
+    }
 }
 
-.buy {
-    background: #20b957;
-    color: white;
-}
-
-.sell {
-    background: #d62d2d;
-    color: white;
-}
-
-.buy:hover {
-    background: #29d66a;
-}
-
-.sell:hover {
-    background: #ff3b3b;
-}
-
-.panel {
-    margin-top: 25px;
-    background: #151515;
+.trade-box {
+    background: #151519;
     border: 1px solid #333;
     border-radius: 15px;
     padding: 20px;
 }
 
-.panel h2 {
-    margin-bottom: 15px;
+.trade-box h2 {
+    margin-top: 0;
 }
 
-input {
-    width: 100%;
-    background: #090909;
-    color: white;
-    border: 1px solid #444;
+.items {
+    min-height: 150px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #202027;
+    border: 1px solid #36363f;
     padding: 12px;
-    border-radius: 8px;
-    margin: 7px 0;
+    border-radius: 10px;
+    margin-bottom: 8px;
 }
 
-.add {
+.item-name {
+    font-weight: bold;
+}
+
+.item-price {
+    color: #aaa;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.remove {
     background: #8b0000;
     color: white;
-    margin-top: 8px;
+    border: 0;
+    border-radius: 7px;
+    padding: 7px 10px;
+    cursor: pointer;
 }
 
-.reset {
-    background: #333;
+.remove:hover {
+    background: #c00000;
+}
+
+/* ADD ITEM */
+
+.add-area {
+    display: grid;
+    grid-template-columns: 1fr 80px 70px;
+    gap: 7px;
+    margin-top: 15px;
+}
+
+select,
+input {
+    background: #0b0b0f;
     color: white;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 0;
 }
 
-footer {
+button {
+    cursor: pointer;
+}
+
+.add-button {
+    background: #b00000;
+    color: white;
+    border: 0;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.add-button:hover {
+    background: #e00000;
+}
+
+/* TOTALS */
+
+.total {
+    margin-top: 18px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.total-label {
+    font-size: 13px;
+    color: #999;
+}
+
+/* RESULT */
+
+.result {
+    margin-top: 20px;
     text-align: center;
-    padding: 30px;
+    background: #151519;
+    border: 1px solid #333;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.result-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.difference {
+    margin-top: 8px;
+    color: #aaa;
+}
+
+/* VALUES */
+
+.values {
+    margin-top: 25px;
+    background: #151519;
+    border: 1px solid #333;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.values h2 {
+    margin-top: 0;
+}
+
+.value-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 5px;
+    border-bottom: 1px solid #292930;
+}
+
+.value-row:last-child {
+    border-bottom: 0;
+}
+
+.school-price {
+    color: #55ff88;
+}
+
+.out-price {
+    color: #ff7777;
+}
+
+.unavailable {
     color: #666;
+    text-decoration: line-through;
 }
 </style>
 </head>
@@ -182,267 +236,737 @@ footer {
 
 <header>
     <h1>🏫 Carr Hill Trading</h1>
-    <p>THE SCHOOL MARKET</p>
+    <p>School Item Trade Calculator</p>
 </header>
-
-<div class="balance">
-    <div>
-        <div>Virtual Balance</div>
-        <div class="money" id="balance">£100.00</div>
-    </div>
-
-    <div class="status" id="schoolStatus">
-        Checking market...
-    </div>
-</div>
 
 <div class="container">
 
-    <div class="market" id="market"></div>
+    <div id="status" class="status"></div>
 
-    <div class="panel">
-        <h2>➕ Add Item</h2>
+    <div class="trade-container">
 
-        <input id="itemName" placeholder="Item name e.g. Radnor Orange">
-        <input id="itemPrice" type="number" step="0.01" placeholder="Starting price (£)">
+        <!-- YOUR SIDE -->
 
-        <button class="add" onclick="addItem()">Add Item</button>
-        <button class="reset" onclick="resetGame()">Reset Game</button>
+        <div class="trade-box">
+
+            <h2>👤 Your Offer</h2>
+
+            <div id="yourItems" class="items">
+                <p style="color:#777;">No items added</p>
+            </div>
+
+            <div class="add-area">
+
+                <select id="yourSelect"></select>
+
+                <input
+                    id="yourQuantity"
+                    type="number"
+                    min="1"
+                    max="99"
+                    value="1"
+                >
+
+                <button
+                    class="add-button"
+                    onclick="addYourItem()">
+                    ADD
+                </button>
+
+            </div>
+
+            <div class="total-label">YOUR VALUE</div>
+            <div id="yourTotal" class="total">£0.00</div>
+
+        </div>
+
+
+        <!-- THEIR SIDE -->
+
+        <div class="trade-box">
+
+            <h2>🤝 Their Offer</h2>
+
+            <div id="theirItems" class="items">
+                <p style="color:#777;">No items added</p>
+            </div>
+
+            <div class="add-area">
+
+                <select id="theirSelect"></select>
+
+                <input
+                    id="theirQuantity"
+                    type="number"
+                    min="1"
+                    max="99"
+                    value="1"
+                >
+
+                <button
+                    class="add-button"
+                    onclick="addTheirItem()">
+                    ADD
+                </button>
+
+            </div>
+
+            <div class="total-label">THEIR VALUE</div>
+            <div id="theirTotal" class="total">£0.00</div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULT -->
+
+    <div class="result">
+
+        <div id="resultTitle" class="result-title">
+            Add items to calculate the trade
+        </div>
+
+        <div id="difference" class="difference"></div>
+
+    </div>
+
+
+    <!-- ITEM VALUES -->
+
+    <div class="values">
+
+        <h2>📋 Item Values</h2>
+
+        <div id="valueList"></div>
+
     </div>
 
 </div>
 
-<footer>
-    Carr Hill Trading • Virtual Market Simulation
-</footer>
 
 <script>
 
-let balance = Number(localStorage.getItem("balance")) || 100;
+/* ==========================================
+   CARR HILL ITEMS
 
-let items = JSON.parse(localStorage.getItem("items")) || [
+   [name, school price, outside price]
+   ========================================== */
+
+const items = [
+
     {
         name: "Radnor Fizz",
-        price: 1.20,
-        basePrice: 1.20,
-        owned: 0,
-        change: 0
+        school: 1.20,
+        outside: 1.00
     },
+
     {
-        name: "Radnor Orange",
-        price: 1.10,
-        basePrice: 1.10,
-        owned: 0,
-        change: 0
+        name: "Sausage Rolls",
+        school: 2.90,
+        outside: 1.50
     },
+
     {
-        name: "Radnor Lemon",
-        price: 1.10,
-        basePrice: 1.10,
-        owned: 0,
-        change: 0
+        name: "Mini Doughnuts",
+        school: 1.20,
+        outside: 2.00
+    },
+
+    {
+        name: "Radnor Splash",
+        school: 2.00,
+        outside: 1.50
+    },
+
+    {
+        name: "Radnor Fruits",
+        school: 1.00,
+        outside: 0.50
+    },
+
+    {
+        name: "Milkshakes",
+        school: 1.50,
+        outside: 2.00
+    },
+
+    {
+        name: "50p 2 Litre Coke Bottle",
+        school: 1.00,
+        outside: 0.70
+    },
+
+    {
+        name: "Popcorn",
+        school: 1.10,
+        outside: 1.00
     }
+
 ];
 
-function save() {
-    localStorage.setItem("balance", balance);
-    localStorage.setItem("items", JSON.stringify(items));
-}
+
+/* ==========================================
+   TRADE ARRAYS
+   ========================================== */
+
+let yourTrade = [];
+let theirTrade = [];
+
+
+/* ==========================================
+   CHECK SCHOOL TIME
+   ========================================== */
 
 function isSchoolTime() {
 
     const now = new Date();
+
     const day = now.getDay();
+
     const hour = now.getHours();
+
     const minute = now.getMinutes();
 
-    // Monday-Friday
-    if (day < 1 || day > 5) return false;
+    const currentMinutes =
+        hour * 60 + minute;
 
-    const time = hour * 60 + minute;
 
-    // 08:30 - 15:30
-    return time >= 510 && time <= 930;
-}
+    /*
+       Monday = 1
+       Friday = 5
 
-function updatePrices() {
+       School market:
+       08:30 → 15:30
+    */
 
-    const school = isSchoolTime();
+    if (day >= 1 && day <= 5) {
 
-    items.forEach(item => {
+        if (
+            currentMinutes >= 510 &&
+            currentMinutes <= 930
+        ) {
 
-        /*
-        During school:
-        prices generally rise.
+            return true;
 
-        Outside school:
-        prices generally fall.
-
-        Random movement keeps the market changing.
-        */
-
-        let movement;
-
-        if (school) {
-            movement = Math.random() * 0.08 + 0.01;
-        } else {
-            movement = -(Math.random() * 0.06 + 0.005);
         }
 
-        item.price += movement;
-
-        // Don't let prices go below 10p
-        if (item.price < 0.10) {
-            item.price = 0.10;
-        }
-
-        // Round to pennies
-        item.price = Math.round(item.price * 100) / 100;
-
-        item.change = ((item.price - item.basePrice) / item.basePrice) * 100;
-    });
-
-    save();
-    render();
-}
-
-function buy(index) {
-
-    const item = items[index];
-
-    if (balance >= item.price) {
-
-        balance -= item.price;
-        item.owned++;
-
-        save();
-        render();
-
-    } else {
-        alert("You don't have enough virtual money! 💷");
-    }
-}
-
-function sell(index) {
-
-    const item = items[index];
-
-    if (item.owned > 0) {
-
-        balance += item.price;
-        item.owned--;
-
-        save();
-        render();
-
-    } else {
-        alert("You don't own any of this item!");
-    }
-}
-
-function addItem() {
-
-    const name = document.getElementById("itemName").value.trim();
-    const price = Number(document.getElementById("itemPrice").value);
-
-    if (!name || !price || price <= 0) {
-        alert("Enter an item name and valid price.");
-        return;
     }
 
-    items.push({
-        name: name,
-        price: price,
-        basePrice: price,
-        owned: 0,
-        change: 0
-    });
+    return false;
 
-    document.getElementById("itemName").value = "";
-    document.getElementById("itemPrice").value = "";
-
-    save();
-    render();
 }
 
-function resetGame() {
 
-    if (!confirm("Reset your entire virtual market?")) return;
+/* ==========================================
+   GET CURRENT PRICE
+   ========================================== */
 
-    localStorage.clear();
+function getPrice(item) {
 
-    location.reload();
+    if (isSchoolTime()) {
+
+        return item.school;
+
+    }
+
+    return item.outside;
+
 }
 
-function render() {
 
-    document.getElementById("balance").textContent =
-        "£" + balance.toFixed(2);
+/* ==========================================
+   FORMAT MONEY
+   ========================================== */
 
-    const school = isSchoolTime();
+function money(amount) {
 
-    document.getElementById("schoolStatus").innerHTML =
-        school
-        ? "📈 SCHOOL MARKET — PRICES RISING"
-        : "📉 AFTER HOURS — PRICES FALLING";
+    return "£" + amount.toFixed(2);
 
-    const market = document.getElementById("market");
+}
 
-    market.innerHTML = "";
+
+/* ==========================================
+   CREATE SELECT MENUS
+   ========================================== */
+
+function createMenus() {
+
+    const yourSelect =
+        document.getElementById("yourSelect");
+
+    const theirSelect =
+        document.getElementById("theirSelect");
+
 
     items.forEach((item, index) => {
 
-        const changeClass = item.change >= 0 ? "up" : "down";
+        const option1 =
+            document.createElement("option");
 
-        const arrow = item.change >= 0 ? "▲" : "▼";
+        option1.value = index;
 
-        market.innerHTML += `
-            <div class="card">
+        option1.textContent =
+            item.name +
+            " — " +
+            money(getPrice(item));
+
+        yourSelect.appendChild(option1);
+
+
+        const option2 =
+            document.createElement("option");
+
+        option2.value = index;
+
+        option2.textContent =
+            item.name +
+            " — " +
+            money(getPrice(item));
+
+        theirSelect.appendChild(option2);
+
+    });
+
+}
+
+
+/* ==========================================
+   ADD TO YOUR TRADE
+   ========================================== */
+
+function addYourItem() {
+
+    const select =
+        document.getElementById("yourSelect");
+
+    const quantityInput =
+        document.getElementById("yourQuantity");
+
+
+    const index =
+        Number(select.value);
+
+    let quantity =
+        Number(quantityInput.value);
+
+
+    if (!Number.isFinite(quantity)) {
+        quantity = 1;
+    }
+
+
+    quantity =
+        Math.max(
+            1,
+            Math.min(99, Math.floor(quantity))
+        );
+
+
+    yourTrade.push({
+
+        index: index,
+        quantity: quantity
+
+    });
+
+
+    render();
+
+}
+
+
+/* ==========================================
+   ADD TO THEIR TRADE
+   ========================================== */
+
+function addTheirItem() {
+
+    const select =
+        document.getElementById("theirSelect");
+
+    const quantityInput =
+        document.getElementById("theirQuantity");
+
+
+    const index =
+        Number(select.value);
+
+    let quantity =
+        Number(quantityInput.value);
+
+
+    if (!Number.isFinite(quantity)) {
+        quantity = 1;
+    }
+
+
+    quantity =
+        Math.max(
+            1,
+            Math.min(99, Math.floor(quantity))
+        );
+
+
+    theirTrade.push({
+
+        index: index,
+        quantity: quantity
+
+    });
+
+
+    render();
+
+}
+
+
+/* ==========================================
+   REMOVE ITEM
+   ========================================== */
+
+function removeYourItem(index) {
+
+    yourTrade.splice(index, 1);
+
+    render();
+
+}
+
+
+function removeTheirItem(index) {
+
+    theirTrade.splice(index, 1);
+
+    render();
+
+}
+
+
+/* ==========================================
+   CALCULATE TOTAL
+   ========================================== */
+
+function calculateTotal(trade) {
+
+    let total = 0;
+
+
+    trade.forEach(entry => {
+
+        const item =
+            items[entry.index];
+
+        total +=
+            getPrice(item) *
+            entry.quantity;
+
+    });
+
+
+    return total;
+
+}
+
+
+/* ==========================================
+   RENDER TRADE
+   ========================================== */
+
+function renderTrade(
+    trade,
+    elementID,
+    removeFunction
+) {
+
+    const container =
+        document.getElementById(elementID);
+
+
+    container.innerHTML = "";
+
+
+    if (trade.length === 0) {
+
+        container.innerHTML =
+            '<p style="color:#777;">No items added</p>';
+
+        return;
+
+    }
+
+
+    trade.forEach((entry, index) => {
+
+        const item =
+            items[entry.index];
+
+        const currentPrice =
+            getPrice(item);
+
+
+        const row =
+            document.createElement("div");
+
+        row.className = "item";
+
+
+        row.innerHTML = `
+
+            <div>
 
                 <div class="item-name">
-                    ${escapeHTML(item.name)}
+                    ${item.name}
                 </div>
 
-                <div class="price">
-                    £${item.price.toFixed(2)}
+                <div class="item-price">
+
+                    ${money(currentPrice)}
+                    ×
+                    ${entry.quantity}
+
                 </div>
-
-                <div class="change ${changeClass}">
-                    ${arrow} ${Math.abs(item.change).toFixed(1)}%
-                </div>
-
-                <div class="holdings">
-                    You own: <strong>${item.owned}</strong>
-                </div>
-
-                <button class="buy" onclick="buy(${index})">
-                    BUY
-                </button>
-
-                <button class="sell" onclick="sell(${index})">
-                    SELL
-                </button>
 
             </div>
+
+            <button
+                class="remove"
+                onclick="${removeFunction}(${index})">
+
+                ×
+
+            </button>
+
         `;
+
+
+        container.appendChild(row);
+
     });
+
 }
 
-function escapeHTML(text) {
 
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
+/* ==========================================
+   UPDATE STATUS
+   ========================================== */
+
+function updateStatus() {
+
+    const status =
+        document.getElementById("status");
+
+
+    if (isSchoolTime()) {
+
+        status.className =
+            "status in-school";
+
+        status.innerHTML =
+            "📈 IN SCHOOL — SCHOOL PRICES ACTIVE";
+
+    } else {
+
+        status.className =
+            "status out-school";
+
+        status.innerHTML =
+            "📉 OUT OF SCHOOL — OUTSIDE PRICES ACTIVE";
+
+    }
+
 }
 
-// Render immediately
-render();
 
-// Change prices every 30 seconds
-setInterval(updatePrices, 30000);
+/* ==========================================
+   UPDATE ITEM VALUE LIST
+   ========================================== */
 
-// Update school status every minute
-setInterval(render, 60000);
+function updateValues() {
+
+    const list =
+        document.getElementById("valueList");
+
+
+    list.innerHTML = "";
+
+
+    items.forEach(item => {
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "value-row";
+
+
+        row.innerHTML = `
+
+            <span>
+                ${item.name}
+            </span>
+
+            <span>
+
+                <span class="school-price">
+                    ${money(item.school)}
+                </span>
+
+                /
+                <span class="out-price">
+                    ${money(item.outside)}
+                </span>
+
+            </span>
+
+        `;
+
+
+        list.appendChild(row);
+
+    });
+
+
+    const fruitPots =
+        document.createElement("div");
+
+    fruitPots.className =
+        "value-row";
+
+
+    fruitPots.innerHTML = `
+
+        <span class="unavailable">
+            Fruit Pots
+        </span>
+
+        <span class="unavailable">
+            UNAVAILABLE
+        </span>
+
+    `;
+
+
+    list.appendChild(fruitPots);
+
+}
+
+
+/* ==========================================
+   MAIN RENDER
+   ========================================== */
+
+function render() {
+
+    renderTrade(
+        yourTrade,
+        "yourItems",
+        "removeYourItem"
+    );
+
+
+    renderTrade(
+        theirTrade,
+        "theirItems",
+        "removeTheirItem"
+    );
+
+
+    const yourTotal =
+        calculateTotal(yourTrade);
+
+    const theirTotal =
+        calculateTotal(theirTrade);
+
+
+    document.getElementById("yourTotal")
+        .textContent =
+        money(yourTotal);
+
+
+    document.getElementById("theirTotal")
+        .textContent =
+        money(theirTotal);
+
+
+    const resultTitle =
+        document.getElementById("resultTitle");
+
+    const difference =
+        document.getElementById("difference");
+
+
+    if (
+        yourTrade.length === 0 &&
+        theirTrade.length === 0
+    ) {
+
+        resultTitle.textContent =
+            "Add items to calculate the trade";
+
+        difference.textContent = "";
+
+        return;
+
+    }
+
+
+    const diff =
+        Math.abs(yourTotal - theirTotal);
+
+
+    if (diff < 0.25) {
+
+        resultTitle.textContent =
+            "⚖️ VERY CLOSE TRADE";
+
+    } else if (yourTotal > theirTotal) {
+
+        resultTitle.textContent =
+            "📈 YOUR OFFER IS WORTH MORE";
+
+    } else {
+
+        resultTitle.textContent =
+            "📈 THEIR OFFER IS WORTH MORE";
+
+    }
+
+
+    difference.textContent =
+        "Difference: " + money(diff);
+
+}
+
+
+/* ==========================================
+   UPDATE EVERYTHING EVERY 30 SECONDS
+   ========================================== */
+
+function updateEverything() {
+
+    updateStatus();
+
+    updateValues();
+
+    render();
+
+}
+
+
+/* START */
+
+createMenus();
+
+updateEverything();
+
+
+/*
+   Recalculate automatically so prices
+   change when school hours begin/end.
+*/
+
+setInterval(updateEverything, 30000);
 
 </script>
 
