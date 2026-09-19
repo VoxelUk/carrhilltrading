@@ -408,6 +408,21 @@
 
     /* NAV */
 
+    /* v30 — reduced motion */
+    body::before,body::after,.brand-mark,.logo,header,.trade-side,.trade-result,.trade-total,#weeklySpotlight:not(.hidden),#tradeLeaderboard .item-row:nth-child(1),#onlineCount,#toast,.nav-btn.active span{animation:none!important}
+    .bottom-nav::before,.card::before,.primary::after,.secondary::after{animation:none!important}
+    .page.active{animation:pageCalm .4s ease-out both!important}
+    @keyframes pageCalm{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .page.active>.card,.page.active>.admin-grid>.card{animation:cardCalm .45s ease-out both!important;animation-delay:0s!important}
+    @keyframes cardCalm{from{opacity:.7;transform:translateY(10px)}to{opacity:1;transform:none}}
+    .card:hover{transform:translateY(-2px)!important}
+    .primary:hover,.secondary:hover,.danger:hover{transform:translateY(-2px)!important}
+    .item-row:hover,.friend-result:hover,.friend-card:hover,.chat-message:hover{transform:translateX(2px)!important}
+    .nav-btn:hover,.nav-btn.active{transform:translateY(-2px)!important}
+    #publicChatBox .chat-message:last-child,#chatBox .chat-message:last-child{animation:messageCalm .28s ease-out!important}
+    @keyframes messageCalm{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+    @media(max-width:600px){.card:active{transform:scale(.99)!important}.nav-btn.active{transform:translateY(-2px)!important}}
+    
     /* v27 — same big movement, slower cinematic timing */
     .page.active{animation-duration:1.25s!important}
     .page.active>.card,.page.active>.admin-grid>.card{animation-duration:1.35s!important}
