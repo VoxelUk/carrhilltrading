@@ -723,7 +723,30 @@
         width: 100%;
       }
     }
-  </style>
+  
+    /* v31 — stable UI: no flying/floating, only fades and press feedback */
+    body::before,body::after,header,.brand-mark,.logo,.trade-side,.trade-result,.trade-total,
+    #weeklySpotlight,#tradeLeaderboard .item-row,#onlineCount,#toast,.nav-btn span,
+    .bottom-nav::before,.card::before,.primary::after,.secondary::after{
+      animation:none!important;
+      transform:none!important;
+    }
+    .page.active,.page.active>.card,.page.active>.admin-grid>.card{
+      animation:fadeOnly .22s ease-out both!important;
+      transform:none!important;
+    }
+    @keyframes fadeOnly{from{opacity:.72}to{opacity:1}}
+    .card:hover,.card:active,.trade-side:hover,.item-row:hover,.friend-result:hover,.friend-card:hover,
+    .chat-message:hover,.nav-btn:hover,.nav-btn.active,input:focus,select:focus,textarea:focus{
+      transform:none!important;
+    }
+    .primary:hover,.secondary:hover,.danger:hover{transform:none!important}
+    .primary:active,.secondary:active,.danger:active{transform:scale(.98)!important}
+    #publicChatBox .chat-message:last-child,#chatBox .chat-message:last-child{
+      animation:fadeOnly .2s ease-out!important;
+      transform:none!important;
+    }
+</style>
 </head>
 
 <body>
