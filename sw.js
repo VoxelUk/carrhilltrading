@@ -1,4 +1,4 @@
-const CACHE="carr-hill-v27";
+const CACHE="carr-hill-v28";
 const ASSETS=["./","./index.html","./manifest.json","./logo.svg","https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(async c=>{for(const a of ASSETS){try{await c.add(a)}catch(_){}}}))});
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
