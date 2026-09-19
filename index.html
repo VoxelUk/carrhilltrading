@@ -1119,7 +1119,8 @@
           <button class="secondary" onclick="loadBugReports()">Refresh reports</button>
           <div id="adminBugReports"></div>
           <hr style="border:0;border-top:1px solid #333;margin:22px 0">
-          <h3>🛡️ Moderator Manager</h3>
+          <h3>🛡️ User & Moderator Manager</h3>
+          <p class="muted">Search an account to manage moderator access or ban/unban it.</p>
           <input id="adminUserSearch" maxlength="20" placeholder="Search username...">
           <button class="secondary" onclick="adminSearchUsers()">Search users</button>
           <div id="adminUserResults"></div>
@@ -1636,7 +1637,7 @@ async function loadProfile() {
   const { data, error } =
     await supabaseClient
       .from("profile")
-      .select("username, avatar_url, role")
+      .select("username, avatar_url, role, banned")
       .eq("id", currentUser.id)
       .maybeSingle();
 
@@ -1645,6 +1646,11 @@ async function loadProfile() {
   }
 
   currentProfile = data ? { ...data, id: currentUser.id } : { id: currentUser.id, role: "user" };
+  if(currentProfile.banned && currentUser.id!==DEV_ID){
+    showToast("This account has been banned.");
+    await logout();
+    return;
+  }
   const isDeveloper = currentUser.id.toLowerCase() === DEV_ID.toLowerCase();
   document.getElementById("adminShortcut")?.classList.toggle("hidden", !isDeveloper);
   document.getElementById("headerAdminBtn")?.classList.toggle("hidden", !isDeveloper);
@@ -2953,14 +2959,23 @@ async function loadBugReports(){
 async function adminSearchUsers(){
   if(currentUser?.id!==DEV_ID)return;
   const q=document.getElementById("adminUserSearch").value.trim(); if(!q)return;
-  const {data,error}=await supabaseClient.from("profile").select("id,username,role").ilike("username",`%${q}%`).limit(15);
+  const {data,error}=await supabaseClient.from("profile").select("id,username,role,banned").ilike("username",`%${q}%`).limit(15);
   if(error){console.error(error);return}
-  document.getElementById("adminUserResults").innerHTML=(data||[]).map(u=>`<div class="friend-card"><div><b>${escapeHTML(u.username)}${roleBadge(u)}</b><div class="user-id">${escapeHTML(u.role||"user")}</div></div>${u.id===DEV_ID?"<span>Developer</span>":`<div class="button-row"><button class="secondary" onclick="setRole('${u.id}','moderator')">Make Mod</button><button class="danger" onclick="setRole('${u.id}','user')">Remove Mod</button></div>`}</div>`).join("");
+  document.getElementById("adminUserResults").innerHTML=(data||[]).map(u=>`<div class="friend-card"><div><b>${escapeHTML(u.username)}${roleBadge(u)}</b><div class="user-id">${escapeHTML(u.role||"user")} ${u.banned?"• 🚫 BANNED":""}</div></div>${u.id===DEV_ID?"<span>Developer</span>":`<div class="button-row"><button class="secondary" onclick="setRole('${u.id}','moderator')">Make Mod</button><button class="secondary" onclick="setRole('${u.id}','user')">Remove Mod</button><button class="${u.banned?"secondary":"danger"}" onclick="setBan('${u.id}',${!u.banned})">${u.banned?"Unban":"🚫 Ban"}</button></div>`}</div>`).join("");
 }
 async function setRole(id,role){
   if(currentUser?.id!==DEV_ID)return;
   const {error}=await supabaseClient.rpc("set_user_role",{target_user:id,new_role:role});
   if(error){showToast("Role change failed");console.error(error);return}showToast(role==="moderator"?"Moderator added":"Moderator removed");adminSearchUsers();
+}
+
+async function setBan(id,banned){
+  if(currentUser?.id!==DEV_ID || id===DEV_ID)return;
+  if(banned && !confirm("Ban this account? They will be signed out and blocked from using the app."))return;
+  const {error}=await supabaseClient.rpc("set_user_banned",{target_user:id,new_banned:banned});
+  if(error){showToast("Ban change failed");console.error(error);return}
+  showToast(banned?"User banned 🚫":"User unbanned ✓");
+  adminSearchUsers();
 }
 
 /* =========================================================
