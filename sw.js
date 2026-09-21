@@ -1,17 +1,53 @@
-const CACHE="carr-hill-v31";
-const ASSETS=["./","./index.html","./manifest.json","./logo.svg","https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"];
-self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(async c=>{for(const a of ASSETS){try{await c.add(a)}catch(_){}}}))});
-self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener("fetch",e=>{
-  if(e.request.method!=="GET")return;
-  const u=new URL(e.request.url);
-  if(u.hostname.includes("supabase.co"))return;
-  if(e.request.mode==="navigate"){
-    e.respondWith(fetch(e.request).then(r=>{const x=r.clone();caches.open(CACHE).then(c=>c.put("./index.html",x));return r}).catch(()=>caches.match("./index.html")));
+const CACHE="carr-hill-v32";
+const CORE=["./","./index.html","./manifest.json","./logo.svg"];
+
+self.addEventListener("install",event=>{
+  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE).then(async cache=>{
+      for(const asset of CORE){
+        try{await cache.add(asset)}catch(_){/* stay installable if one asset is temporarily unavailable */}
+      }
+    })
+  );
+});
+
+self.addEventListener("activate",event=>{
+  event.waitUntil(
+    caches.keys()
+      .then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key))))
+      .then(()=>self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch",event=>{
+  if(event.request.method!=="GET") return;
+
+  const url=new URL(event.request.url);
+  if(url.hostname.includes("supabase.co")) return;
+
+  // Pages and same-origin app files are network-first so deployed updates appear
+  // immediately, while the last working copy remains available offline.
+  if(event.request.mode==="navigate" || url.origin===self.location.origin){
+    event.respondWith(
+      fetch(event.request)
+        .then(response=>{
+          if(response && response.ok){
+            const copy=response.clone();
+            caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+          }
+          return response;
+        })
+        .catch(async()=>{
+          const cached=await caches.match(event.request);
+          return cached || caches.match("./index.html");
+        })
+    );
     return;
   }
-  e.respondWith(caches.match(e.request).then(cached=>{
-    const network=fetch(e.request).then(r=>{if(r&&r.ok){const x=r.clone();caches.open(CACHE).then(c=>c.put(e.request,x))}return r}).catch(()=>cached);
-    return cached||network;
-  }));
+
+  // Third-party GETs use cache fallback without blocking live data APIs.
+  event.respondWith(
+    fetch(event.request).catch(()=>caches.match(event.request))
+  );
 });
