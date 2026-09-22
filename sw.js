@@ -1,4 +1,4 @@
-const CACHE="carr-hill-v32";
+const CACHE="carr-hill-v33";
 const CORE=["./","./index.html","./manifest.json","./logo.svg"];
 
 self.addEventListener("install",event=>{
@@ -24,6 +24,9 @@ self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET") return;
 
   const url=new URL(event.request.url);
+
+  // Never cache Supabase API/auth/realtime requests. They contain live user data
+  // and must always go directly to the network.
   if(url.hostname.includes("supabase.co")) return;
 
   // Pages and same-origin app files are network-first so deployed updates appear
@@ -46,8 +49,26 @@ self.addEventListener("fetch",event=>{
     return;
   }
 
-  // Third-party GETs use cache fallback without blocking live data APIs.
-  event.respondWith(
-    fetch(event.request).catch(()=>caches.match(event.request))
-  );
+  // Cache successful third-party static assets (for example the Supabase JS CDN)
+  // after first use. This keeps the installed app shell usable offline without
+  // caching any Supabase user data or API responses.
+  event.respondWith((async()=>{
+    const cached=await caches.match(event.request);
+    if(cached) return cached;
+
+    try{
+      const response=await fetch(event.request);
+      if(response && (response.ok || response.type==="opaque")){
+        const copy=response.clone();
+        event.waitUntil(caches.open(CACHE).then(cache=>cache.put(event.request,copy)));
+      }
+      return response;
+    }catch(_){
+      return new Response("Offline",{
+        status:503,
+        statusText:"Offline",
+        headers:{"Content-Type":"text/plain; charset=utf-8"}
+      });
+    }
+  })());
 });
