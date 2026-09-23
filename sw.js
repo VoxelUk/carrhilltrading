@@ -1,5 +1,14 @@
-const CACHE="carr-hill-v33";
+const CACHE="carr-hill-v34";
 const CORE=["./","./index.html","./manifest.json","./logo.svg"];
+const MAX_RUNTIME_ENTRIES=60;
+const STATIC_DESTINATIONS=new Set(["script","style","font","image"]);
+
+async function trimCache(cacheName,maxEntries=MAX_RUNTIME_ENTRIES){
+  const cache=await caches.open(cacheName);
+  const keys=await cache.keys();
+  if(keys.length<=maxEntries)return;
+  await Promise.all(keys.slice(0,keys.length-maxEntries).map(request=>cache.delete(request)));
+}
 
 self.addEventListener("install",event=>{
   self.skipWaiting();
@@ -37,7 +46,11 @@ self.addEventListener("fetch",event=>{
         .then(response=>{
           if(response && response.ok){
             const copy=response.clone();
-            caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+            event.waitUntil(
+              caches.open(CACHE)
+                .then(cache=>cache.put(event.request,copy))
+                .then(()=>trimCache(CACHE))
+            );
           }
           return response;
         })
@@ -49,9 +62,10 @@ self.addEventListener("fetch",event=>{
     return;
   }
 
-  // Cache successful third-party static assets (for example the Supabase JS CDN)
-  // after first use. This keeps the installed app shell usable offline without
-  // caching any Supabase user data or API responses.
+  // Only cache third-party static assets. Other external requests stay network-only
+  // so live or potentially sensitive responses never end up in the PWA cache.
+  if(!STATIC_DESTINATIONS.has(event.request.destination)) return;
+
   event.respondWith((async()=>{
     const cached=await caches.match(event.request);
     if(cached) return cached;
@@ -60,7 +74,11 @@ self.addEventListener("fetch",event=>{
       const response=await fetch(event.request);
       if(response && (response.ok || response.type==="opaque")){
         const copy=response.clone();
-        event.waitUntil(caches.open(CACHE).then(cache=>cache.put(event.request,copy)));
+        event.waitUntil(
+          caches.open(CACHE)
+            .then(cache=>cache.put(event.request,copy))
+            .then(()=>trimCache(CACHE))
+        );
       }
       return response;
     }catch(_){
