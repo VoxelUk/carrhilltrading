@@ -3080,6 +3080,43 @@ function setupPresence(){
     });
 }
 
+async function enableNotifications(){
+  if(!("Notification" in window)) return showToast("Notifications aren't supported on this device");
+  try{
+    const permission=await Notification.requestPermission();
+    if(permission==="granted"){
+      localStorage.setItem("carrHillNotifications","on");
+      showToast("Notifications enabled 🔔");
+      const b=document.getElementById("notificationToggle"); if(b)b.textContent="🔔";
+    }else showToast("Notifications weren't enabled");
+  }catch(e){console.error(e);showToast("Could not enable notifications")}
+}
+
+async function showAppNotification(title,body,tag){
+  if(!("Notification" in window) || Notification.permission!=="granted") return;
+  if(localStorage.getItem("carrHillNotifications")!=="on") return;
+  try{
+    if("serviceWorker" in navigator){
+      const reg=await navigator.serviceWorker.ready;
+      await reg.showNotification(title,{body,tag,icon:"./logo.svg",badge:"./logo.svg"});
+    }else new Notification(title,{body,tag});
+  }catch(e){console.warn("Notification unavailable",e)}
+}
+
+function addNotificationToggle(){
+  if(!("Notification" in window) || document.getElementById("notificationToggle")) return;
+  const header=document.querySelector("header"); if(!header)return;
+  const b=document.createElement("button");
+  b.id="notificationToggle";
+  b.className="secondary";
+  b.style.cssText="padding:7px 10px;margin-left:8px";
+  b.textContent=Notification.permission==="granted"?"🔔":"🔕";
+  b.title="Enable notifications";
+  b.onclick=enableNotifications;
+  header.appendChild(b);
+}
+document.addEventListener("DOMContentLoaded",addNotificationToggle);
+
 function setupRealtime() {
 
   if (!currentUser) return;
@@ -3101,11 +3138,27 @@ function setupRealtime() {
       }
     )
     .on("postgres_changes",{event:"*",schema:"public",table:"trades"},async()=>{await loadTrades()})
-    .on("postgres_changes",{event:"*",schema:"public",table:"messages"},async payload=>{
-      if(activeChatFriend && (payload.new?.sender_id===activeChatFriend || payload.new?.receiver_id===activeChatFriend)) await loadMessages();
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},async payload=>{
+      const m=payload.new||{};
+      if(activeChatFriend && (m.sender_id===activeChatFriend || m.receiver_id===activeChatFriend)) await loadMessages();
+      if(m.receiver_id===currentUser.id && m.sender_id!==currentUser.id){
+        let sender="Someone";
+        try{
+          const {data}=await supabaseClient.from("profile").select("username").eq("id",m.sender_id).maybeSingle();
+          if(data?.username)sender="@"+data.username;
+        }catch(_){}
+        await showAppNotification("New message from "+sender,String(m.message||"New private message").slice(0,140),"private-"+m.sender_id);
+      }
     })
     .on("postgres_changes",{event:"*",schema:"public",table:"announcements"},async()=>{await loadAnnouncement()})
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"public_messages"},async()=>{await loadPublicMessages()})
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"public_messages"},async payload=>{
+      await loadPublicMessages();
+      const m=payload.new||{};
+      if(m.user_id!==currentUser.id){
+        const who=m.user_id===DEV_ID?"ilikebeagles12346":(m.username||"Someone");
+        await showAppNotification("New Global Chat message","@"+who+": "+String(m.message||"").slice(0,120),"global-chat");
+      }
+    })
     .subscribe();
 }
 
