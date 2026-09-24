@@ -1,13 +1,16 @@
-const CACHE="carr-hill-v34";
+const CACHE="carr-hill-v35";
 const CORE=["./","./index.html","./manifest.json","./logo.svg"];
 const MAX_RUNTIME_ENTRIES=60;
 const STATIC_DESTINATIONS=new Set(["script","style","font","image"]);
+const CORE_URLS=new Set(CORE.map(asset=>new URL(asset,self.location.href).href));
 
 async function trimCache(cacheName,maxEntries=MAX_RUNTIME_ENTRIES){
   const cache=await caches.open(cacheName);
   const keys=await cache.keys();
-  if(keys.length<=maxEntries)return;
-  await Promise.all(keys.slice(0,keys.length-maxEntries).map(request=>cache.delete(request)));
+  const removable=keys.filter(request=>!CORE_URLS.has(request.url));
+  const overflow=Math.max(0,keys.length-maxEntries);
+  if(!overflow)return;
+  await Promise.all(removable.slice(0,overflow).map(request=>cache.delete(request)));
 }
 
 self.addEventListener("install",event=>{
